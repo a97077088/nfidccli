@@ -24,6 +24,7 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -53,6 +54,11 @@ begin
 end;
 
 procedure TFormMain.Button4Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormMain.Button5Click(Sender: TObject);
 begin
 //
 end;

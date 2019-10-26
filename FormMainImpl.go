@@ -630,3 +630,8 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 	}()
 }
 
+
+func (f *TFormMain) OnButton5Click(sender vcl.IObject) {
+
+}
+
