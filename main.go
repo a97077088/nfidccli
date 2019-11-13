@@ -2,13 +2,16 @@
 package main
 
 import (
-    "github.com/ying32/govcl/vcl"
+	"github.com/ying32/govcl/vcl"
 )
 
 func main() {
-    vcl.Application.SetFormScaled(true)
-    vcl.Application.Initialize()
-    vcl.Application.SetMainFormOnTaskBar(true)
-    vcl.Application.CreateForm(formMainBytes, &FormMain)
-    vcl.Application.Run()
+	vcl.Application.SetFormScaled(true)
+	vcl.Application.Initialize()
+	vcl.Application.SetMainFormOnTaskBar(true)
+	vcl.Application.CreateForm(formHomeBytes, &FormHome)
+	vcl.Application.CreateForm(formLoginBytes, &FormLogin)
+	vcl.Application.CreateForm(formMainBytes, &FormMain)
+	vcl.Application.CreateForm(formjianceBytes, &Formjiance)
+	vcl.Application.Run()
 }

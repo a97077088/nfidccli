@@ -15,49 +15,50 @@ import (
 
 //::private::
 type TFormMainFields struct {
-    ck string
-    lt string
-    execution string
-    uid string
-    chs []*nifdc.Channel
+	ck        string
+	lt        string
+	execution string
+	uid       string
+	chs       []*nifdc.Channel
 }
+
 func (f *TFormMain) OnButton1Click(sender vcl.IObject) {
-    f.Button1.SetEnabled(false)
-    err:= func() error{
-        var err error
-        f.ck,f.lt,f.execution,err=nifdc.Initck(nil)
-        if err!=nil{
-            return err
-        }
-        pd:="1234567"
-        pd+="8"
-        scks,err:=nifdc.Login("15738889730",pd,f.ck,f.lt,f.execution,nil)
-        if err!=nil{
-            return err
-        }
-        f.ck=scks
-        uid,chs,err:=nifdc.TaskIndex(f.ck,nil)
-        if err!=nil{
-            return err
-        }
-        f.uid=uid
-        f.chs=chs
-        f.Cbb1.Clear()
-        for _,ch:=range chs{
-            f.Cbb1.Items().Add(ch.Name)
-        }
-        //f.ck=fmt.Sprintf("%s;%s",f.ck,scks)
-        return nil
-    }()
-    if err!=nil{
-        vcl.ShowMessage(err.Error())
-        f.Button1.SetEnabled(true)
-    }else{
-        f.Button1.SetCaption("登录成功")
-    }
+	f.Button1.SetEnabled(false)
+	err := func() error {
+		var err error
+		f.ck, f.lt, f.execution, err = nifdc.InitLoginck(nil)
+		if err != nil {
+			return err
+		}
+		pd := "1234567"
+		pd += "8"
+		scks, err := nifdc.Login("15738889730", pd, f.ck, f.lt, f.execution, nil)
+		if err != nil {
+			return err
+		}
+		f.ck = scks
+		f.ck, err = nifdc.Test_platform_login(f.ck, nil)
+		if err != nil {
+			return err
+		}
+		uid, chs, err := nifdc.Sample_login(f.ck, nil)
+		f.uid = uid
+		f.chs = chs
+		f.Cbb1.Clear()
+		for _, ch := range chs {
+			f.Cbb1.Items().Add(ch.Name)
+		}
+		//f.ck=fmt.Sprintf("%s;%s",f.ck,scks)
+		return nil
+	}()
+	if err != nil {
+		vcl.ShowMessage(err.Error())
+		f.Button1.SetEnabled(true)
+	} else {
+		f.Button1.SetCaption("登录成功")
+	}
 
 }
-
 
 func (f *TFormMain) OnFormCreate(sender vcl.IObject) {
 
@@ -66,24 +67,23 @@ func (f *TFormMain) OnFormCreate(sender vcl.IObject) {
 func (f *TFormMain) OnLabel2Click(sender vcl.IObject) {
 }
 
-
 func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 	f.Button2.SetEnabled(false)
 
 	go func() {
 		defer f.Button2.SetEnabled(true)
 
-		err:= func() error{
-			if f.Cbb1.ItemIndex()==-1{
+		err := func() error {
+			if f.Cbb1.ItemIndex() == -1 {
 				return errors.New("必须先选择通道")
 			}
 			var err error
-			f.ck,err=nifdc.Switchchannel(f.uid,f.chs[f.Cbb1.ItemIndex()].Type,f.ck,nil)
-			if err!=nil{
+			_, err = nifdc.Sample_switchchannel(f.uid, f.chs[f.Cbb1.ItemIndex()].Type, f.ck, nil)
+			if err != nil {
 				return err
 			}
-			dt,err:=nifdc.DownData(4,f.ck,nil)
-			if err!=nil{
+			dt, err := nifdc.DownData(4, f.ck, "", "", nil)
+			if err != nil {
 				return err
 			}
 			vcl.ThreadSync(func() {
@@ -91,8 +91,8 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 				f.Gauge1.SetMaxValue(int32(len(dt.Data)))
 			})
 
-			xlsxsheet:="Sheet1"
-			Sheetidx:=1
+			xlsxsheet := "Sheet1"
+			Sheetidx := 1
 			xlsx := excelize.NewFile()
 			xlsx.SetCellValue(xlsxsheet, "A1", "委托单位")
 			xlsx.SetCellValue(xlsxsheet, "B1", "抽样地点")
@@ -126,52 +126,51 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 			//
 			//xlsx.SetColWidth(xlsxsheet,"A","AC",20)
 
-			for _,d:=range dt.Data{
+			for _, d := range dt.Data {
 				Sheetidx++
-				xlsx.SetRowHeight(xlsxsheet,Sheetidx,30)
-				itr,err:=nettool.RNet_Call_1(&nettool.RNetOptions{
-				}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-					tr,err:=nifdc.Viewnormalsample(d.Sample_code,f.ck,nil)
-					if err!=nil{
-						return nil,err
+				xlsx.SetRowHeight(xlsxsheet, Sheetidx, 30)
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Viewnormalsample(d.Sample_code, f.ck, nil)
+					if err != nil {
+						return nil, err
 					}
-					return tr,nil
+					return tr, nil
 				})
-				if err!=nil{
+				if err != nil {
 					return err
 				}
-				tr:=itr.(map[string]string)
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("A%d",Sheetidx),tr["委托单位"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("B%d",Sheetidx),tr["抽样地点"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("C%d",Sheetidx),tr["抽样单号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("D%d",Sheetidx),tr["检验类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("E%d",Sheetidx),tr["抽送样人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("F%d",Sheetidx),tr["受检单位"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("G%d",Sheetidx),tr["地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("H%d",Sheetidx),tr["联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("I%d",Sheetidx),tr["电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("J%d",Sheetidx),tr["生产单位地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("K%d",Sheetidx),tr["生产单位"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("L%d",Sheetidx),tr["生产单位联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("M%d",Sheetidx),tr["生产单位电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("N%d",Sheetidx),tr["商标"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("O%d",Sheetidx),tr["样品名称br"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("P%d",Sheetidx),tr["生产日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Q%d",Sheetidx),tr["保质期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("R%d",Sheetidx),tr["生产批号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("S%d",Sheetidx),tr["规格型号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("T%d",Sheetidx),tr["样品等级"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("U%d",Sheetidx),tr["抽到样日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("V%d",Sheetidx),tr["抽样方式"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("W%d",Sheetidx),tr["样品状态"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("X%d",Sheetidx),tr["样品状态2"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Y%d",Sheetidx),tr["保存条件"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Z%d",Sheetidx),tr["抽样基数"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AA%d",Sheetidx),tr["样品数"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AB%d",Sheetidx),tr["检验依据"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AC%d",Sheetidx),tr["备注"])
+				tr := itr.(map[string]string)
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("A%d", Sheetidx), tr["委托单位"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("B%d", Sheetidx), tr["抽样地点"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("C%d", Sheetidx), tr["抽样单号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("D%d", Sheetidx), tr["检验类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("E%d", Sheetidx), tr["抽送样人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("F%d", Sheetidx), tr["受检单位"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("G%d", Sheetidx), tr["地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("H%d", Sheetidx), tr["联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("I%d", Sheetidx), tr["电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("J%d", Sheetidx), tr["生产单位地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("K%d", Sheetidx), tr["生产单位"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("L%d", Sheetidx), tr["生产单位联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("M%d", Sheetidx), tr["生产单位电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("N%d", Sheetidx), tr["商标"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("O%d", Sheetidx), tr["样品名称br"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("P%d", Sheetidx), tr["生产日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Q%d", Sheetidx), tr["保质期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("R%d", Sheetidx), tr["生产批号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("S%d", Sheetidx), tr["规格型号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("T%d", Sheetidx), tr["样品等级"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("U%d", Sheetidx), tr["抽到样日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("V%d", Sheetidx), tr["抽样方式"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("W%d", Sheetidx), tr["样品状态"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("X%d", Sheetidx), tr["样品状态2"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Y%d", Sheetidx), tr["保存条件"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Z%d", Sheetidx), tr["抽样基数"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AA%d", Sheetidx), tr["样品数"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AB%d", Sheetidx), tr["检验依据"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AC%d", Sheetidx), tr["备注"])
 				vcl.ThreadSync(func() {
-					f.Gauge1.SetProgress(f.Gauge1.Progress()+1)
+					f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
 				})
 			}
 			xlsx.SaveAs("./抽样完成导出.xlsx")
@@ -180,7 +179,7 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 			})
 			return nil
 		}()
-		if err!=nil{
+		if err != nil {
 			vcl.ThreadSync(func() {
 				vcl.ShowMessage(err.Error())
 			})
@@ -188,24 +187,23 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 	}()
 }
 
-
 func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 	f.Button3.SetEnabled(false)
 
 	go func() {
 		defer f.Button3.SetEnabled(true)
 
-		err:= func() error{
-			if f.Cbb1.ItemIndex()==-1{
+		err := func() error {
+			if f.Cbb1.ItemIndex() == -1 {
 				return errors.New("必须先选择通道")
 			}
 			var err error
-			f.ck,err=nifdc.Switchchannel(f.uid,f.chs[f.Cbb1.ItemIndex()].Type,f.ck,nil)
-			if err!=nil{
+			_, err = nifdc.Sample_switchchannel(f.uid, f.chs[f.Cbb1.ItemIndex()].Type, f.ck, nil)
+			if err != nil {
 				return err
 			}
-			dt,err:=nifdc.DownData(4,f.ck,nil)
-			if err!=nil{
+			dt, err := nifdc.DownData(4, f.ck, "", "", nil)
+			if err != nil {
 				return err
 			}
 			vcl.ThreadSync(func() {
@@ -213,8 +211,8 @@ func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 				f.Gauge1.SetMaxValue(int32(len(dt.Data)))
 			})
 
-			xlsxsheet:="Sheet1"
-			Sheetidx:=1
+			xlsxsheet := "Sheet1"
+			Sheetidx := 1
 			xlsx := excelize.NewFile()
 			xlsx.SetCellValue(xlsxsheet, "A1", "任务来源")
 			xlsx.SetCellValue(xlsxsheet, "B1", "报送分类")
@@ -294,105 +292,102 @@ func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 			xlsx.SetCellValue(xlsxsheet, "BX1", "执行标准/技术文件")
 			xlsx.SetCellValue(xlsxsheet, "BY1", "备注")
 
-
-
 			//
 			//xlsx.SetColWidth(xlsxsheet,"A","AC",20)
 
-			for _,d:=range dt.Data{
+			for _, d := range dt.Data {
 				Sheetidx++
-				xlsx.SetRowHeight(xlsxsheet,Sheetidx,30)
-				itr,err:=nettool.RNet_Call_1(&nettool.RNetOptions{
-				}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-					tr,err:=nifdc.Viewnormalsample_full(d.Sample_code,f.ck,nil)
-					if err!=nil{
-						return nil,err
+				xlsx.SetRowHeight(xlsxsheet, Sheetidx, 30)
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Viewnormalsample_full(d.Sample_code, f.ck, nil)
+					if err != nil {
+						return nil, err
 					}
-					return tr,nil
+					return tr, nil
 				})
-				if err!=nil{
+				if err != nil {
 					return err
 				}
-				tr:=itr.(map[string]string)
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("A%d",Sheetidx),tr["抽样基础信息_任务来源"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("B%d",Sheetidx),tr["抽样基础信息_报送分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("C%d",Sheetidx),tr["抽样基础信息_检验机构名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("D%d",Sheetidx),tr["抽样基础信息_部署机构"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("E%d",Sheetidx),tr["抽样基础信息_抽样类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("F%d",Sheetidx),tr["抽样基础信息_抽样环节"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("G%d",Sheetidx),tr["抽样基础信息_抽样地点"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("H%d",Sheetidx),tr["抽样基础信息_食品分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("I%d",Sheetidx),tr["抽样基础信息_抽样单编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("J%d",Sheetidx),tr["抽样基础信息_检验目的/任务类别"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("K%d",Sheetidx),tr["抽样单位信息_单位名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("L%d",Sheetidx),tr["抽样单位信息_单位地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("M%d",Sheetidx),tr["抽样单位信息_所在省份"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("N%d",Sheetidx),tr["抽样单位信息_抽样人员"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("O%d",Sheetidx),tr["抽样单位信息_联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("P%d",Sheetidx),tr["抽样单位信息_电子邮箱"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Q%d",Sheetidx),tr["抽样单位信息_电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("R%d",Sheetidx),tr["抽样单位信息_传真"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("S%d",Sheetidx),tr["抽样单位信息_邮编"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("T%d",Sheetidx),tr["抽检场所信息_所在地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("U%d",Sheetidx),tr["抽检场所信息_区域类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("V%d",Sheetidx),tr["抽检场所信息_单位名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("W%d",Sheetidx),tr["抽检场所信息_单位地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("X%d",Sheetidx),tr["抽检场所信息_营业执照/社会信用代码"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Y%d",Sheetidx),tr["抽检场所信息_许可证类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Z%d",Sheetidx),tr["抽检场所信息_经营许可证号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AA%d",Sheetidx),tr["抽检场所信息_年销售额"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AB%d",Sheetidx),tr["抽检场所信息_单位法人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AC%d",Sheetidx),tr["抽检场所信息_联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AD%d",Sheetidx),tr["抽检场所信息_电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AE%d",Sheetidx),tr["抽检场所信息_传真"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AF%d",Sheetidx),tr["抽检场所信息_邮编"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AG%d",Sheetidx),tr["抽检场所信息_摊位号或姓名"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AH%d",Sheetidx),tr["抽检场所信息_身份证号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AI%d",Sheetidx),tr["抽样生产企业信息_所在地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AJ%d",Sheetidx),tr["抽样生产企业信息_企业地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AK%d",Sheetidx),tr["抽样生产企业信息_企业名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AL%d",Sheetidx),tr["抽样生产企业信息_生产许可证编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AM%d",Sheetidx),tr["抽样生产企业信息_生产单位联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AN%d",Sheetidx),tr["抽样生产企业信息_生产单位电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AO%d",Sheetidx),tr["抽样生产企业信息_是否存在第三方企业信息"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AP%d",Sheetidx),tr["抽样生产企业信息_第三方企业省份"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AQ%d",Sheetidx),tr["抽样生产企业信息_第三方企业市区"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AR%d",Sheetidx),tr["抽样生产企业信息_第三方企业县区"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AS%d",Sheetidx),tr["抽样生产企业信息_第三方企业地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AT%d",Sheetidx),tr["抽样生产企业信息_第三方企业名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AU%d",Sheetidx),tr["抽样生产企业信息_第三方企业许可证编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AV%d",Sheetidx),tr["抽样生产企业信息_第三方企业联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AW%d",Sheetidx),tr["抽样生产企业信息_第三方企业电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AX%d",Sheetidx),tr["抽样生产企业信息_第三方企业性质"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AY%d",Sheetidx),tr["抽检样品信息_样品条码"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AZ%d",Sheetidx),tr["抽检样品信息_样品商标"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BA%d",Sheetidx),tr["抽检样品信息_样品类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BB%d",Sheetidx),tr["抽检样品信息_样品来源"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BC%d",Sheetidx),tr["抽检样品信息_样品属性"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BD%d",Sheetidx),tr["抽检样品信息_包装分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BE%d",Sheetidx),tr["抽检样品信息_样品名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BF%d",Sheetidx),tr["抽检样品信息_购进日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BG%d",Sheetidx),tr["抽检样品信息_保质期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BH%d",Sheetidx),tr["抽检样品信息_样品批号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BI%d",Sheetidx),tr["抽检样品信息_规格型号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BJ%d",Sheetidx),tr["抽检样品信息_质量等级"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BK%d",Sheetidx),tr["抽检样品信息_单价"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BL%d",Sheetidx),tr["抽检样品信息_是否进口"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BM%d",Sheetidx),tr["抽检样品信息_原产地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BN%d",Sheetidx),tr["抽检样品信息_抽样日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BO%d",Sheetidx),tr["抽检样品信息_抽样方式"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BP%d",Sheetidx),tr["抽检样品信息_样品形态"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BQ%d",Sheetidx),tr["抽检样品信息_样品包装"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BR%d",Sheetidx),tr["抽检样品信息_抽样工具"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BS%d",Sheetidx),tr["抽检样品信息_抽样时样品储存条件"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BT%d",Sheetidx),tr["抽检样品信息_抽样基数"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BU%d",Sheetidx),tr["抽检样品信息_抽样数量"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BV%d",Sheetidx),tr["抽检样品信息_备样数量"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BW%d",Sheetidx),tr["抽检样品信息_抽样数量单位"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BX%d",Sheetidx),tr["抽检样品信息_执行标准/技术文件"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BY%d",Sheetidx),tr["抽检样品信息_备注"])
+				tr := itr.(map[string]string)
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("A%d", Sheetidx), tr["抽样基础信息_任务来源"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("B%d", Sheetidx), tr["抽样基础信息_报送分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("C%d", Sheetidx), tr["抽样基础信息_检验机构名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("D%d", Sheetidx), tr["抽样基础信息_部署机构"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("E%d", Sheetidx), tr["抽样基础信息_抽样类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("F%d", Sheetidx), tr["抽样基础信息_抽样环节"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("G%d", Sheetidx), tr["抽样基础信息_抽样地点"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("H%d", Sheetidx), tr["抽样基础信息_食品分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("I%d", Sheetidx), tr["抽样基础信息_抽样单编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("J%d", Sheetidx), tr["抽样基础信息_检验目的/任务类别"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("K%d", Sheetidx), tr["抽样单位信息_单位名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("L%d", Sheetidx), tr["抽样单位信息_单位地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("M%d", Sheetidx), tr["抽样单位信息_所在省份"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("N%d", Sheetidx), tr["抽样单位信息_抽样人员"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("O%d", Sheetidx), tr["抽样单位信息_联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("P%d", Sheetidx), tr["抽样单位信息_电子邮箱"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Q%d", Sheetidx), tr["抽样单位信息_电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("R%d", Sheetidx), tr["抽样单位信息_传真"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("S%d", Sheetidx), tr["抽样单位信息_邮编"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("T%d", Sheetidx), tr["抽检场所信息_所在地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("U%d", Sheetidx), tr["抽检场所信息_区域类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("V%d", Sheetidx), tr["抽检场所信息_单位名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("W%d", Sheetidx), tr["抽检场所信息_单位地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("X%d", Sheetidx), tr["抽检场所信息_营业执照/社会信用代码"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Y%d", Sheetidx), tr["抽检场所信息_许可证类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Z%d", Sheetidx), tr["抽检场所信息_经营许可证号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AA%d", Sheetidx), tr["抽检场所信息_年销售额"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AB%d", Sheetidx), tr["抽检场所信息_单位法人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AC%d", Sheetidx), tr["抽检场所信息_联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AD%d", Sheetidx), tr["抽检场所信息_电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AE%d", Sheetidx), tr["抽检场所信息_传真"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AF%d", Sheetidx), tr["抽检场所信息_邮编"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AG%d", Sheetidx), tr["抽检场所信息_摊位号或姓名"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AH%d", Sheetidx), tr["抽检场所信息_身份证号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AI%d", Sheetidx), tr["抽样生产企业信息_所在地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AJ%d", Sheetidx), tr["抽样生产企业信息_企业地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AK%d", Sheetidx), tr["抽样生产企业信息_企业名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AL%d", Sheetidx), tr["抽样生产企业信息_生产许可证编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AM%d", Sheetidx), tr["抽样生产企业信息_生产单位联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AN%d", Sheetidx), tr["抽样生产企业信息_生产单位电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AO%d", Sheetidx), tr["抽样生产企业信息_是否存在第三方企业信息"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AP%d", Sheetidx), tr["抽样生产企业信息_第三方企业省份"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AQ%d", Sheetidx), tr["抽样生产企业信息_第三方企业市区"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AR%d", Sheetidx), tr["抽样生产企业信息_第三方企业县区"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AS%d", Sheetidx), tr["抽样生产企业信息_第三方企业地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AT%d", Sheetidx), tr["抽样生产企业信息_第三方企业名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AU%d", Sheetidx), tr["抽样生产企业信息_第三方企业许可证编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AV%d", Sheetidx), tr["抽样生产企业信息_第三方企业联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AW%d", Sheetidx), tr["抽样生产企业信息_第三方企业电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AX%d", Sheetidx), tr["抽样生产企业信息_第三方企业性质"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AY%d", Sheetidx), tr["抽检样品信息_样品条码"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AZ%d", Sheetidx), tr["抽检样品信息_样品商标"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BA%d", Sheetidx), tr["抽检样品信息_样品类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BB%d", Sheetidx), tr["抽检样品信息_样品来源"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BC%d", Sheetidx), tr["抽检样品信息_样品属性"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BD%d", Sheetidx), tr["抽检样品信息_包装分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BE%d", Sheetidx), tr["抽检样品信息_样品名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BF%d", Sheetidx), tr["抽检样品信息_购进日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BG%d", Sheetidx), tr["抽检样品信息_保质期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BH%d", Sheetidx), tr["抽检样品信息_样品批号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BI%d", Sheetidx), tr["抽检样品信息_规格型号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BJ%d", Sheetidx), tr["抽检样品信息_质量等级"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BK%d", Sheetidx), tr["抽检样品信息_单价"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BL%d", Sheetidx), tr["抽检样品信息_是否进口"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BM%d", Sheetidx), tr["抽检样品信息_原产地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BN%d", Sheetidx), tr["抽检样品信息_抽样日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BO%d", Sheetidx), tr["抽检样品信息_抽样方式"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BP%d", Sheetidx), tr["抽检样品信息_样品形态"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BQ%d", Sheetidx), tr["抽检样品信息_样品包装"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BR%d", Sheetidx), tr["抽检样品信息_抽样工具"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BS%d", Sheetidx), tr["抽检样品信息_抽样时样品储存条件"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BT%d", Sheetidx), tr["抽检样品信息_抽样基数"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BU%d", Sheetidx), tr["抽检样品信息_抽样数量"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BV%d", Sheetidx), tr["抽检样品信息_备样数量"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BW%d", Sheetidx), tr["抽检样品信息_抽样数量单位"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BX%d", Sheetidx), tr["抽检样品信息_执行标准/技术文件"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BY%d", Sheetidx), tr["抽检样品信息_备注"])
 				vcl.ThreadSync(func() {
-					f.Gauge1.SetProgress(f.Gauge1.Progress()+1)
+					f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
 				})
 			}
 			xlsx.SaveAs("./抽样完成导出_全字段.xlsx")
@@ -401,7 +396,7 @@ func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 			})
 			return nil
 		}()
-		if err!=nil{
+		if err != nil {
 			vcl.ThreadSync(func() {
 				vcl.ShowMessage(err.Error())
 			})
@@ -409,24 +404,23 @@ func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 	}()
 }
 
-
 func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 	f.Button4.SetEnabled(false)
 
 	go func() {
 		defer f.Button4.SetEnabled(true)
 
-		err:= func() error{
-			if f.Cbb1.ItemIndex()==-1{
+		err := func() error {
+			if f.Cbb1.ItemIndex() == -1 {
 				return errors.New("必须先选择通道")
 			}
 			var err error
-			f.ck,err=nifdc.Switchchannel(f.uid,f.chs[f.Cbb1.ItemIndex()].Type,f.ck,nil)
-			if err!=nil{
+			_, err = nifdc.Sample_switchchannel(f.uid, f.chs[f.Cbb1.ItemIndex()].Type, f.ck, nil)
+			if err != nil {
 				return err
 			}
-			dt,err:=nifdc.DownData(5,f.ck,nil)
-			if err!=nil{
+			dt, err := nifdc.DownData(5, f.ck, "", "", nil)
+			if err != nil {
 				return err
 			}
 			vcl.ThreadSync(func() {
@@ -434,8 +428,8 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 				f.Gauge1.SetMaxValue(int32(len(dt.Data)))
 			})
 
-			xlsxsheet:="Sheet1"
-			Sheetidx:=1
+			xlsxsheet := "Sheet1"
+			Sheetidx := 1
 			xlsx := excelize.NewFile()
 			xlsx.SetCellValue(xlsxsheet, "A1", "任务来源")
 			xlsx.SetCellValue(xlsxsheet, "B1", "报送分类")
@@ -515,105 +509,102 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 			xlsx.SetCellValue(xlsxsheet, "BX1", "执行标准/技术文件")
 			xlsx.SetCellValue(xlsxsheet, "BY1", "备注")
 
-
-
 			//
 			//xlsx.SetColWidth(xlsxsheet,"A","AC",20)
 
-			for _,d:=range dt.Data{
+			for _, d := range dt.Data {
 				Sheetidx++
-				xlsx.SetRowHeight(xlsxsheet,Sheetidx,30)
-				itr,err:=nettool.RNet_Call_1(&nettool.RNetOptions{
-				}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-					tr,err:=nifdc.Viewcheckedsample_full(d.Sample_code,f.ck,nil)
-					if err!=nil{
-						return nil,err
+				xlsx.SetRowHeight(xlsxsheet, Sheetidx, 30)
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Viewcheckedsample_full(d.Sample_code, f.ck, nil)
+					if err != nil {
+						return nil, err
 					}
-					return tr,nil
+					return tr, nil
 				})
-				if err!=nil{
+				if err != nil {
 					return err
 				}
-				tr:=itr.(map[string]string)
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("A%d",Sheetidx),tr["抽样基础信息_任务来源"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("B%d",Sheetidx),tr["抽样基础信息_报送分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("C%d",Sheetidx),tr["抽样基础信息_检验机构名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("D%d",Sheetidx),tr["抽样基础信息_部署机构"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("E%d",Sheetidx),tr["抽样基础信息_抽样类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("F%d",Sheetidx),tr["抽样基础信息_抽样环节"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("G%d",Sheetidx),tr["抽样基础信息_抽样地点"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("H%d",Sheetidx),tr["抽样基础信息_食品分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("I%d",Sheetidx),tr["抽样基础信息_抽样单编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("J%d",Sheetidx),tr["抽样基础信息_检验目的/任务类别"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("K%d",Sheetidx),tr["抽样单位信息_单位名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("L%d",Sheetidx),tr["抽样单位信息_单位地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("M%d",Sheetidx),tr["抽样单位信息_所在省份"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("N%d",Sheetidx),tr["抽样单位信息_抽样人员"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("O%d",Sheetidx),tr["抽样单位信息_联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("P%d",Sheetidx),tr["抽样单位信息_电子邮箱"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Q%d",Sheetidx),tr["抽样单位信息_电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("R%d",Sheetidx),tr["抽样单位信息_传真"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("S%d",Sheetidx),tr["抽样单位信息_邮编"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("T%d",Sheetidx),tr["抽检场所信息_所在地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("U%d",Sheetidx),tr["抽检场所信息_区域类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("V%d",Sheetidx),tr["抽检场所信息_单位名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("W%d",Sheetidx),tr["抽检场所信息_单位地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("X%d",Sheetidx),tr["抽检场所信息_营业执照/社会信用代码"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Y%d",Sheetidx),tr["抽检场所信息_许可证类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("Z%d",Sheetidx),tr["抽检场所信息_经营许可证号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AA%d",Sheetidx),tr["抽检场所信息_年销售额"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AB%d",Sheetidx),tr["抽检场所信息_单位法人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AC%d",Sheetidx),tr["抽检场所信息_联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AD%d",Sheetidx),tr["抽检场所信息_电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AE%d",Sheetidx),tr["抽检场所信息_传真"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AF%d",Sheetidx),tr["抽检场所信息_邮编"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AG%d",Sheetidx),tr["抽检场所信息_摊位号或姓名"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AH%d",Sheetidx),tr["抽检场所信息_身份证号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AI%d",Sheetidx),tr["抽样生产企业信息_所在地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AJ%d",Sheetidx),tr["抽样生产企业信息_企业地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AK%d",Sheetidx),tr["抽样生产企业信息_企业名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AL%d",Sheetidx),tr["抽样生产企业信息_生产许可证编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AM%d",Sheetidx),tr["抽样生产企业信息_生产单位联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AN%d",Sheetidx),tr["抽样生产企业信息_生产单位电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AO%d",Sheetidx),tr["抽样生产企业信息_是否存在第三方企业信息"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AP%d",Sheetidx),tr["抽样生产企业信息_第三方企业省份"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AQ%d",Sheetidx),tr["抽样生产企业信息_第三方企业市区"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AR%d",Sheetidx),tr["抽样生产企业信息_第三方企业县区"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AS%d",Sheetidx),tr["抽样生产企业信息_第三方企业地址"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AT%d",Sheetidx),tr["抽样生产企业信息_第三方企业名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AU%d",Sheetidx),tr["抽样生产企业信息_第三方企业许可证编号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AV%d",Sheetidx),tr["抽样生产企业信息_第三方企业联系人"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AW%d",Sheetidx),tr["抽样生产企业信息_第三方企业电话"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AX%d",Sheetidx),tr["抽样生产企业信息_第三方企业性质"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AY%d",Sheetidx),tr["抽检样品信息_样品条码"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("AZ%d",Sheetidx),tr["抽检样品信息_样品商标"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BA%d",Sheetidx),tr["抽检样品信息_样品类型"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BB%d",Sheetidx),tr["抽检样品信息_样品来源"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BC%d",Sheetidx),tr["抽检样品信息_样品属性"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BD%d",Sheetidx),tr["抽检样品信息_包装分类"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BE%d",Sheetidx),tr["抽检样品信息_样品名称"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BF%d",Sheetidx),tr["抽检样品信息_购进日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BG%d",Sheetidx),tr["抽检样品信息_保质期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BH%d",Sheetidx),tr["抽检样品信息_样品批号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BI%d",Sheetidx),tr["抽检样品信息_规格型号"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BJ%d",Sheetidx),tr["抽检样品信息_质量等级"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BK%d",Sheetidx),tr["抽检样品信息_单价"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BL%d",Sheetidx),tr["抽检样品信息_是否进口"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BM%d",Sheetidx),tr["抽检样品信息_原产地"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BN%d",Sheetidx),tr["抽检样品信息_抽样日期"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BO%d",Sheetidx),tr["抽检样品信息_抽样方式"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BP%d",Sheetidx),tr["抽检样品信息_样品形态"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BQ%d",Sheetidx),tr["抽检样品信息_样品包装"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BR%d",Sheetidx),tr["抽检样品信息_抽样工具"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BS%d",Sheetidx),tr["抽检样品信息_抽样时样品储存条件"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BT%d",Sheetidx),tr["抽检样品信息_抽样基数"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BU%d",Sheetidx),tr["抽检样品信息_抽样数量"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BV%d",Sheetidx),tr["抽检样品信息_备样数量"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BW%d",Sheetidx),tr["抽检样品信息_抽样数量单位"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BX%d",Sheetidx),tr["抽检样品信息_执行标准/技术文件"])
-				xlsx.SetCellValue(xlsxsheet,fmt.Sprintf("BY%d",Sheetidx),tr["抽检样品信息_备注"])
+				tr := itr.(map[string]string)
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("A%d", Sheetidx), tr["抽样基础信息_任务来源"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("B%d", Sheetidx), tr["抽样基础信息_报送分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("C%d", Sheetidx), tr["抽样基础信息_检验机构名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("D%d", Sheetidx), tr["抽样基础信息_部署机构"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("E%d", Sheetidx), tr["抽样基础信息_抽样类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("F%d", Sheetidx), tr["抽样基础信息_抽样环节"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("G%d", Sheetidx), tr["抽样基础信息_抽样地点"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("H%d", Sheetidx), tr["抽样基础信息_食品分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("I%d", Sheetidx), tr["抽样基础信息_抽样单编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("J%d", Sheetidx), tr["抽样基础信息_检验目的/任务类别"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("K%d", Sheetidx), tr["抽样单位信息_单位名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("L%d", Sheetidx), tr["抽样单位信息_单位地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("M%d", Sheetidx), tr["抽样单位信息_所在省份"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("N%d", Sheetidx), tr["抽样单位信息_抽样人员"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("O%d", Sheetidx), tr["抽样单位信息_联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("P%d", Sheetidx), tr["抽样单位信息_电子邮箱"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Q%d", Sheetidx), tr["抽样单位信息_电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("R%d", Sheetidx), tr["抽样单位信息_传真"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("S%d", Sheetidx), tr["抽样单位信息_邮编"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("T%d", Sheetidx), tr["抽检场所信息_所在地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("U%d", Sheetidx), tr["抽检场所信息_区域类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("V%d", Sheetidx), tr["抽检场所信息_单位名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("W%d", Sheetidx), tr["抽检场所信息_单位地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("X%d", Sheetidx), tr["抽检场所信息_营业执照/社会信用代码"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Y%d", Sheetidx), tr["抽检场所信息_许可证类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("Z%d", Sheetidx), tr["抽检场所信息_经营许可证号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AA%d", Sheetidx), tr["抽检场所信息_年销售额"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AB%d", Sheetidx), tr["抽检场所信息_单位法人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AC%d", Sheetidx), tr["抽检场所信息_联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AD%d", Sheetidx), tr["抽检场所信息_电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AE%d", Sheetidx), tr["抽检场所信息_传真"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AF%d", Sheetidx), tr["抽检场所信息_邮编"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AG%d", Sheetidx), tr["抽检场所信息_摊位号或姓名"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AH%d", Sheetidx), tr["抽检场所信息_身份证号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AI%d", Sheetidx), tr["抽样生产企业信息_所在地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AJ%d", Sheetidx), tr["抽样生产企业信息_企业地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AK%d", Sheetidx), tr["抽样生产企业信息_企业名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AL%d", Sheetidx), tr["抽样生产企业信息_生产许可证编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AM%d", Sheetidx), tr["抽样生产企业信息_生产单位联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AN%d", Sheetidx), tr["抽样生产企业信息_生产单位电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AO%d", Sheetidx), tr["抽样生产企业信息_是否存在第三方企业信息"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AP%d", Sheetidx), tr["抽样生产企业信息_第三方企业省份"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AQ%d", Sheetidx), tr["抽样生产企业信息_第三方企业市区"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AR%d", Sheetidx), tr["抽样生产企业信息_第三方企业县区"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AS%d", Sheetidx), tr["抽样生产企业信息_第三方企业地址"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AT%d", Sheetidx), tr["抽样生产企业信息_第三方企业名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AU%d", Sheetidx), tr["抽样生产企业信息_第三方企业许可证编号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AV%d", Sheetidx), tr["抽样生产企业信息_第三方企业联系人"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AW%d", Sheetidx), tr["抽样生产企业信息_第三方企业电话"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AX%d", Sheetidx), tr["抽样生产企业信息_第三方企业性质"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AY%d", Sheetidx), tr["抽检样品信息_样品条码"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("AZ%d", Sheetidx), tr["抽检样品信息_样品商标"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BA%d", Sheetidx), tr["抽检样品信息_样品类型"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BB%d", Sheetidx), tr["抽检样品信息_样品来源"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BC%d", Sheetidx), tr["抽检样品信息_样品属性"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BD%d", Sheetidx), tr["抽检样品信息_包装分类"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BE%d", Sheetidx), tr["抽检样品信息_样品名称"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BF%d", Sheetidx), tr["抽检样品信息_购进日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BG%d", Sheetidx), tr["抽检样品信息_保质期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BH%d", Sheetidx), tr["抽检样品信息_样品批号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BI%d", Sheetidx), tr["抽检样品信息_规格型号"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BJ%d", Sheetidx), tr["抽检样品信息_质量等级"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BK%d", Sheetidx), tr["抽检样品信息_单价"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BL%d", Sheetidx), tr["抽检样品信息_是否进口"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BM%d", Sheetidx), tr["抽检样品信息_原产地"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BN%d", Sheetidx), tr["抽检样品信息_抽样日期"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BO%d", Sheetidx), tr["抽检样品信息_抽样方式"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BP%d", Sheetidx), tr["抽检样品信息_样品形态"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BQ%d", Sheetidx), tr["抽检样品信息_样品包装"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BR%d", Sheetidx), tr["抽检样品信息_抽样工具"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BS%d", Sheetidx), tr["抽检样品信息_抽样时样品储存条件"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BT%d", Sheetidx), tr["抽检样品信息_抽样基数"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BU%d", Sheetidx), tr["抽检样品信息_抽样数量"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BV%d", Sheetidx), tr["抽检样品信息_备样数量"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BW%d", Sheetidx), tr["抽检样品信息_抽样数量单位"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BX%d", Sheetidx), tr["抽检样品信息_执行标准/技术文件"])
+				xlsx.SetCellValue(xlsxsheet, fmt.Sprintf("BY%d", Sheetidx), tr["抽检样品信息_备注"])
 				vcl.ThreadSync(func() {
-					f.Gauge1.SetProgress(f.Gauge1.Progress()+1)
+					f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
 				})
 			}
 			xlsx.SaveAs("./已接收导出_全字段.xlsx")
@@ -622,7 +613,7 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 			})
 			return nil
 		}()
-		if err!=nil{
+		if err != nil {
 			vcl.ThreadSync(func() {
 				vcl.ShowMessage(err.Error())
 			})
@@ -630,8 +621,6 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 	}()
 }
 
-
 func (f *TFormMain) OnButton5Click(sender vcl.IObject) {
 
 }
-
