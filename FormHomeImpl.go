@@ -41,7 +41,7 @@ func (f *TFormHome) OnFormClose(sender vcl.IObject, action *types.TCloseAction) 
 }
 func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	FormHome.SetShowInTaskBar(types.StAlways)
-	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s", user))
+	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s 线程:%d", user,thread))
 	f.Cbbt1s2.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt1s3.SetItemIndex(0)
