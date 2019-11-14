@@ -738,13 +738,15 @@ func (f *TFormHome) OnButtont2s1Click(sender vcl.IObject) {
 			sheetname := xlsx.GetSheetMap()[1]
 			rows := xlsx.GetRows(sheetname)
 			for _, row := range rows {
-				ok, err := regexp.MatchString(`\w{20}`, row[0])
+
+				ok, err := regexp.MatchString(`NCP\d+|DC\d+`, row[0])
 				if err != nil {
 					return err
 				}
 				if ok == false {
 					continue
 				}
+
 				d := f.GetUploadDataOrCreate(row[0])
 				d.SSEV("样品匹配", "否")
 				d.SSEV("抽样单编号", row[0])
@@ -909,8 +911,32 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 						if _td.SEV("样品匹配") == "否" {
 							return errors.New("没有匹配数据")
 						}
+						err:=nettool.RNet_Call(nil, func(source *addrmgr.AddrSource) error {
+							fddetail,err:=nifdc.Test_platform_foodTest_foodDetail(td.Env_for_key("id").(int),f.test_platform_ck,nil)
+							if err!=nil{
+								return err
+							}
+							testinfo,err:=nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"],f.test_platform_ck,nil)
+							if err!=nil{
+								return err
+							}
+							nifdc.Fill_item(map[string]string{
+								"报告书编号":_td.SEV("报告书编号"),
+								"监督抽检报告备注":_td.SEV("监督抽检报告备注"),
+								"风险监测报告备注":_td.SEV("风险监测报告备注"),
+							},fddetail)
+							nifdc.Fill_subitem(_td.Subitem(),testinfo.Rows)
+							err=nifdc.Test_platform_api_food_save(fddetail,testinfo.Rows,f.test_platform_ck,nil)
+							if err!=nil{
+								return err
+							}
 
-						_td.SSEV("上传结果", "成功")
+							_td.SSEV("上传结果", "成功")
+							return nil
+						})
+						if err!=nil{
+							return err
+						}
 						return nil
 					}()
 					vcl.ThreadSync(func() {

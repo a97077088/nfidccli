@@ -9,9 +9,9 @@ func main() {
 	vcl.Application.SetFormScaled(true)
 	vcl.Application.Initialize()
 	vcl.Application.SetMainFormOnTaskBar(true)
-	vcl.Application.CreateForm(formHomeBytes, &FormHome)
-	vcl.Application.CreateForm(formLoginBytes, &FormLogin)
-	vcl.Application.CreateForm(formMainBytes, &FormMain)
-	vcl.Application.CreateForm(formjianceBytes, &Formjiance)
+    vcl.Application.CreateForm(formLoginBytes, &FormLogin)
+    vcl.Application.CreateForm(formHomeBytes, &FormHome)
+    vcl.Application.CreateForm(formMainBytes, &FormMain)
+    vcl.Application.CreateForm(formjianceBytes, &Formjiance)
 	vcl.Application.Run()
 }

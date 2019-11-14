@@ -16,6 +16,8 @@ type
     Label2: TLabel;
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -35,6 +37,16 @@ begin
 end;
 
 procedure TFormLogin.Button2Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormLogin.FormCreate(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormLogin.FormShow(Sender: TObject);
 begin
 //
 end;

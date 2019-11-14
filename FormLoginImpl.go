@@ -50,6 +50,7 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 			return
 		}
 		vcl.ThreadSync(func() {
+			//ioutil.WriteFile("./ck",[]byte(ck),os.ModePerm)
 			FormLogin.Hide()
 			FormHome.Show()
 		})
@@ -59,3 +60,24 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 func (f *TFormLogin) OnButton2Click(sender vcl.IObject) {
 	f.Close()
 }
+
+func (f *TFormLogin) OnFormCreate(sender vcl.IObject) {
+
+}
+
+
+func (f *TFormLogin) OnFormShow(sender vcl.IObject) {
+	//if rtl.FileExists("./ck")==true{
+	//	byck,_:=ioutil.ReadFile("./ck")
+	//	ck=string(byck)
+	//	FormHome.Show()
+	//	go func() {
+	//		time.Sleep(time.Millisecond*200)
+	//		vcl.ThreadSync(func() {
+	//			f.Hide()
+	//		})
+	//	}()
+	//	return
+	//}
+}
+

@@ -24,7 +24,7 @@ func (f *TFormjiance) OnFormShow(sender vcl.IObject) {
 	tditem := f.Td.Subitem()
 	for idx, tdit := range tditem {
 		item := items.Add()
-		item.SetCaption(fmt.Sprintf("%d", idx))
+		item.SetCaption(fmt.Sprintf("%d", idx+1))
 		subitem := item.SubItems()
 		subitem.Add(tdit["检验项目"])
 		subitem.Add(tdit["检验结果"])
