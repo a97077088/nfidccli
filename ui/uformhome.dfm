@@ -48,7 +48,6 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
-        ExplicitTop = -3
         DesignSize = (
           1279
           57)

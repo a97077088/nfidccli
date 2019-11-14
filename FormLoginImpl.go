@@ -7,10 +7,6 @@ import (
 	"errors"
 	"github.com/a97077088/nifdc"
 	"github.com/ying32/govcl/vcl"
-	"github.com/ying32/govcl/vcl/rtl"
-	"io/ioutil"
-	"os"
-	"time"
 )
 
 //::private::
@@ -54,7 +50,7 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 			return
 		}
 		vcl.ThreadSync(func() {
-			ioutil.WriteFile("./ck", []byte(ck), os.ModePerm)
+			//ioutil.WriteFile("./ck", []byte(ck), os.ModePerm)
 			FormLogin.Hide()
 			FormHome.Show()
 		})
@@ -70,16 +66,16 @@ func (f *TFormLogin) OnFormCreate(sender vcl.IObject) {
 }
 
 func (f *TFormLogin) OnFormShow(sender vcl.IObject) {
-	if rtl.FileExists("./ck") == true {
-		byck, _ := ioutil.ReadFile("./ck")
-		ck = string(byck)
-		FormHome.Show()
-		go func() {
-			time.Sleep(time.Millisecond * 200)
-			vcl.ThreadSync(func() {
-				f.Hide()
-			})
-		}()
-		return
-	}
+	//if rtl.FileExists("./ck") == true {
+	//	byck, _ := ioutil.ReadFile("./ck")
+	//	ck = string(byck)
+	//	FormHome.Show()
+	//	go func() {
+	//		time.Sleep(time.Millisecond * 200)
+	//		vcl.ThreadSync(func() {
+	//			f.Hide()
+	//		})
+	//	}()
+	//	return
+	//}
 }

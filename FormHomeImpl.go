@@ -45,6 +45,8 @@ func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	f.Cbbt1s2.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt1s3.SetItemIndex(0)
+	f.Dtpt1s1.SetDate(time.Now().AddDate(0, 0, -1))
+	f.Dtpt1s2.SetDate(time.Now())
 }
 func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 	err := func() error {
@@ -115,8 +117,9 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 			}
 			vcl.ThreadSync(func() {
 				f.sample_ds_lk.Lock()
-				defer f.sample_ds_lk.Unlock()
 				f.sample_ds = tmpds
+				f.sample_ds_lk.Unlock()
+
 				f.ListView1.Items().SetCount(int32(len(f.sample_ds.Data)))
 			})
 			return nil
@@ -556,7 +559,7 @@ func (f *TFormHome) ExportJianyanwancheng_half(thread int, data []*nifdc.Data_o,
 		_d := d
 		th.Req(func() interface{} {
 			itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-				tr, err := nifdc.Viewnormalsample(_d.Sample_code, f.sample_ck, nil)
+				tr, err := nifdc.Viewnormalsample_mode1(_d.Sample_code, f.sample_ck, nil)
 				if err != nil {
 					return nil, err
 				}

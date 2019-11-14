@@ -130,7 +130,7 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 				Sheetidx++
 				xlsx.SetRowHeight(xlsxsheet, Sheetidx, 30)
 				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-					tr, err := nifdc.Viewnormalsample(d.Sample_code, f.ck, nil)
+					tr, err := nifdc.Viewnormalsample_mode1(d.Sample_code, f.ck, nil)
 					if err != nil {
 						return nil, err
 					}

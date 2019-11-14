@@ -4,8 +4,10 @@ object FormLogin: TFormLogin
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = #30331#24405
   ClientHeight = 291
-  ClientWidth = 396
+  ClientWidth = 399
   Color = clBtnFace
+  Constraints.MinHeight = 335
+  Constraints.MinWidth = 417
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
@@ -31,11 +33,11 @@ object FormLogin: TFormLogin
     ParentFont = False
   end
   object Label2: TLabel
-    Left = 71
+    Left = 159
     Top = 259
-    Width = 261
+    Width = 50
     Height = 24
-    Caption = #25216#26415#25903#25345': '#22825#27941#38647#21338#36719#20214#26377#38480#20844#21496
+    Caption = 'v0.0.1'
   end
   object LabelEdit1: TLabeledEdit
     Left = 128
