@@ -39,6 +39,7 @@ type
     ListView2: TListView;
     Gauge2: TGauge;
     DlgOpen1: TOpenDialog;
+    Cbbt1s3: TComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Tss1Show(Sender: TObject);
@@ -55,6 +56,7 @@ type
     procedure Tss2Show(Sender: TObject);
     procedure Buttont2s3Click(Sender: TObject);
     procedure ListView2DblClick(Sender: TObject);
+    procedure Cbbt1s2Change(Sender: TObject);
   private
     { Private declarations }
   public
@@ -89,6 +91,11 @@ begin
 end;
 
 procedure TFormHome.Buttont2s3Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Cbbt1s2Change(Sender: TObject);
 begin
 //
 end;

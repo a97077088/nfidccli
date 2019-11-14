@@ -13,7 +13,6 @@ import (
 	"github.com/a97077088/threadpool"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
-	"github.com/ying32/govcl/vcl/win"
 	"regexp"
 	"sync"
 	"sync/atomic"
@@ -41,9 +40,11 @@ func (f *TFormHome) OnFormClose(sender vcl.IObject, action *types.TCloseAction) 
 	vcl.Application.Terminate()
 }
 func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
+	FormHome.SetShowInTaskBar(types.StAlways)
 	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s", user))
 	f.Cbbt1s2.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
+	f.Cbbt1s3.SetItemIndex(0)
 }
 func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 	err := func() error {
@@ -612,13 +613,9 @@ func (f *TFormHome) ExportJianyanwancheng_half(thread int, data []*nifdc.Data_o,
 	return nil
 }
 func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
-	d := 0
-	sel := int(f.Cbbt1s2.ItemIndex())
-	if sel == 0 {
-		if win.MessageBox(0, "是否要导出专用字段", "信息", win.MB_OKCANCEL|win.MB_ICONQUESTION) == types.IdOK {
-			d = 1
-		}
-	}
+
+	sel := int(f.Cbbt1s2.ItemIndex())  //任务状态
+	ssel := int(f.Cbbt1s3.ItemIndex()) //导出模式
 	if f.SaveDialog1.Execute() == false {
 		return
 	}
@@ -643,7 +640,7 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 				f.Gauge1.SetMaxValue(int32(len(tmpds.Data)))
 			})
 			if sel == 0 { //导出抽样完成
-				if d == 0 { //导出全部字段
+				if ssel == 0 { //导出全部字段
 					err := f.ExportJianyanwancheng_full(thread, tmpds.Data, fname)
 					if err != nil {
 						return err
@@ -988,4 +985,15 @@ func (f *TFormHome) OnListView2DblClick(sender vcl.IObject) {
 	f.uploaddatas_lk.Unlock()
 	Formjiance.Td = td
 	Formjiance.ShowModal()
+}
+
+func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
+	f.Cbbt1s3.Clear()
+	if f.Cbbt1s2.Text() == "抽样完成" {
+		f.Cbbt1s3.Items().Add("全部导出")
+		f.Cbbt1s3.Items().Add("模式1")
+	} else if f.Cbbt1s2.Text() == "已接收" {
+		f.Cbbt1s3.Items().Add("全部导出")
+	}
+	f.Cbbt1s3.SetItemIndex(0)
 }

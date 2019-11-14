@@ -5,7 +5,6 @@ object FormHome: TFormHome
   ClientHeight = 680
   ClientWidth = 1293
   Color = clBtnFace
-  DoubleBuffered = True
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
@@ -25,14 +24,12 @@ object FormHome: TFormHome
     Width = 1287
     Height = 667
     Margins.Top = 10
-    ActivePage = Tss2
+    ActivePage = Tss1
     Align = alClient
     TabOrder = 0
-    ExplicitHeight = 666
     object Tss1: TTabSheet
       Caption = #19979#36733#26679#21697#20449#24687
       OnShow = Tss1Show
-      ExplicitHeight = 627
       object Gauge1: TGauge
         Left = 0
         Top = 587
@@ -51,55 +48,61 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
+        ExplicitTop = -3
         DesignSize = (
           1279
           57)
         object Label3: TLabel
-          Left = 24
-          Top = 16
+          Left = 462
+          Top = 11
           Width = 76
           Height = 24
+          Anchors = [akTop, akRight]
           Caption = #36873#25321#31995#32479':'
         end
         object Label4: TLabel
-          Left = 318
-          Top = 16
+          Left = 742
+          Top = 11
           Width = 76
           Height = 24
+          Anchors = [akTop, akRight]
           Caption = #20219#21153#29366#24577':'
         end
         object Label5: TLabel
-          Left = 672
-          Top = 15
+          Left = 14
+          Top = 11
           Width = 76
           Height = 24
-          Anchors = [akTop, akRight]
           Caption = #25277#26679#26085#26399':'
         end
         object Label6: TLabel
-          Left = 904
-          Top = 14
+          Left = 237
+          Top = 11
           Width = 8
           Height = 24
-          Anchors = [akTop, akRight]
           Caption = '-'
-          ExplicitLeft = 847
         end
         object Cbbt1s1: TComboBox
-          Left = 110
-          Top = 11
-          Width = 195
+          Left = 544
+          Top = 8
+          Width = 192
           Height = 32
+          Anchors = [akTop, akRight]
           DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
           ParentDoubleBuffered = False
+          ParentFont = False
           TabOrder = 0
         end
         object Dtpt1s1: TDateTimePicker
-          Left = 765
-          Top = 11
+          Left = 97
+          Top = 8
           Width = 135
           Height = 32
-          Anchors = [akTop, akRight]
           Date = 43781.000000000000000000
           Time = 0.933494293982221300
           DoubleBuffered = False
@@ -107,23 +110,30 @@ object FormHome: TFormHome
           TabOrder = 1
         end
         object Cbbt1s2: TComboBox
-          Left = 407
-          Top = 11
-          Width = 145
+          Left = 822
+          Top = 8
+          Width = 130
           Height = 32
+          Anchors = [akTop, akRight]
           DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
           ParentDoubleBuffered = False
+          ParentFont = False
           TabOrder = 2
+          OnChange = Cbbt1s2Change
           Items.Strings = (
             #25277#26679#23436#25104
             #24050#25509#25910)
         end
         object Dtpt1s2: TDateTimePicker
-          Left = 918
-          Top = 11
+          Left = 251
+          Top = 8
           Width = 137
           Height = 32
-          Anchors = [akTop, akRight]
           Date = 43781.000000000000000000
           Time = 0.934004062502936000
           DoubleBuffered = False
@@ -131,8 +141,8 @@ object FormHome: TFormHome
           TabOrder = 3
         end
         object Buttonp1s1: TButton
-          Left = 1070
-          Top = 8
+          Left = 966
+          Top = 4
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -141,14 +151,24 @@ object FormHome: TFormHome
           OnClick = Buttonp1s1Click
         end
         object Buttonp1s2: TButton
-          Left = 1165
-          Top = 8
+          Left = 1178
+          Top = 4
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
           Caption = #23548#20986
           TabOrder = 5
           OnClick = Buttonp1s2Click
+        end
+        object Cbbt1s3: TComboBox
+          Left = 1061
+          Top = 8
+          Width = 111
+          Height = 32
+          TabOrder = 6
+          Items.Strings = (
+            #20840#37096#23548#20986
+            #27169#24335'1')
         end
       end
       object ListView1: TListView
@@ -191,6 +211,7 @@ object FormHome: TFormHome
             AutoSize = True
             Caption = #25277#26679#20154
           end>
+        DoubleBuffered = True
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -200,19 +221,18 @@ object FormHome: TFormHome
         HideSelection = False
         OwnerData = True
         RowSelect = True
+        ParentDoubleBuffered = False
         ParentFont = False
         TabOrder = 1
         ViewStyle = vsReport
         OnData = ListView1Data
         OnResize = ListView1Resize
-        ExplicitHeight = 523
       end
     end
     object Tss2: TTabSheet
       Caption = #19978#20256#26816#39564#32467#26524
       ImageIndex = 1
       OnShow = Tss2Show
-      ExplicitHeight = 627
       object Gauge2: TGauge
         Left = 0
         Top = 587
@@ -352,6 +372,7 @@ object FormHome: TFormHome
             AutoSize = True
             Caption = #19978#20256#32467#26524
           end>
+        DoubleBuffered = True
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -360,19 +381,18 @@ object FormHome: TFormHome
         GridLines = True
         OwnerData = True
         RowSelect = True
+        ParentDoubleBuffered = False
         ParentFont = False
         TabOrder = 1
         ViewStyle = vsReport
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
-        ExplicitHeight = 523
       end
     end
     object Tss3: TTabSheet
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
-      ExplicitHeight = 627
       object Label1: TLabel
         Left = 0
         Top = 0
