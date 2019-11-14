@@ -16,6 +16,7 @@ import (
 	"github.com/ying32/govcl/vcl/win"
 	"regexp"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -901,9 +902,8 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 				f.Gauge2.SetProgress(0)
 				f.Gauge2.SetMaxValue(int32(len(tmpds)))
 			})
+			var nok, nerr int32
 			th := threadpool.NewThreadPool(thread, len(tmpds))
-
-			time.Sleep(time.Second * 3)
 			for _, td := range tmpds {
 				_td := td
 				th.Req(func() interface{} {
@@ -911,30 +911,44 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 						if _td.SEV("样品匹配") == "否" {
 							return errors.New("没有匹配数据")
 						}
-						err:=nettool.RNet_Call(nil, func(source *addrmgr.AddrSource) error {
-							fddetail,err:=nifdc.Test_platform_foodTest_foodDetail(td.Env_for_key("id").(int),f.test_platform_ck,nil)
-							if err!=nil{
+						err := nettool.RNet_Call(nil, func(source *addrmgr.AddrSource) error {
+							fddetail, err := nifdc.Test_platform_foodTest_foodDetail(td.Env_for_key("id").(int), f.test_platform_ck, nil)
+							if err != nil {
 								return err
 							}
-							testinfo,err:=nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"],f.test_platform_ck,nil)
-							if err!=nil{
+							testinfo, err := nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
+							if err != nil {
 								return err
 							}
+							subitem := _td.Subitem()
+							unqualifieds := nifdc.Getunqualified(subitem)
+							jielun := "纯抽检合格样品"
+							baogaoleibie := "合格报告"
+							if len(unqualifieds) != 0 {
+								jielun = "纯抽检不合格样品"
+								baogaoleibie = "一般不合格报告"
+							}
+							jiancejielun := nifdc.Buildbaogao(subitem)
+
 							nifdc.Fill_item(map[string]string{
-								"报告书编号":_td.SEV("报告书编号"),
-								"监督抽检报告备注":_td.SEV("监督抽检报告备注"),
-								"风险监测报告备注":_td.SEV("风险监测报告备注"),
-							},fddetail)
-							nifdc.Fill_subitem(_td.Subitem(),testinfo.Rows)
-							err=nifdc.Test_platform_api_food_save(fddetail,testinfo.Rows,f.test_platform_ck,nil)
-							if err!=nil{
+								"报告书编号":    _td.SEV("报告书编号"),
+								"监督抽检报告备注": _td.SEV("监督抽检报告备注"),
+								"风险监测报告备注": _td.SEV("风险监测报告备注"),
+								"结论":       jielun,
+								"报告类别":     baogaoleibie,
+								"检验结论":     jiancejielun,
+							}, fddetail)
+							nifdc.Fill_subitem(subitem, testinfo.Rows)
+							err = nifdc.Test_platform_api_food_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
+							if err != nil {
 								return err
 							}
 
+							atomic.AddInt32(&nok, 1)
 							_td.SSEV("上传结果", "成功")
 							return nil
 						})
-						if err!=nil{
+						if err != nil {
 							return err
 						}
 						return nil
@@ -944,13 +958,16 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 					})
 					_td.SSEV("上传状态", "是")
 					if err != nil {
+						atomic.AddInt32(&nerr, 1)
 						_td.SSEV("上传结果", err.Error())
 					}
 					return nil
 				})
 			}
 			th.Wait()
-			fmt.Println(tmpds)
+			vcl.ThreadSync(func() {
+				vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n错误:%d", nok, nerr))
+			})
 			return nil
 		}()
 		if err != nil {
