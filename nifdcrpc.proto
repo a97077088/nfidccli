@@ -1,0 +1,13 @@
+syntax="proto3";
+package proc;
+
+service Nifdcrpc{
+    rpc Login(LoginReq)returns(LoginRes);
+}
+
+message LoginReq{
+    string r=1;
+}
+message LoginRes{
+    string r=1;
+}

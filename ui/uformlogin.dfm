@@ -49,7 +49,6 @@ object FormLogin: TFormLogin
     EditLabel.Caption = #29992#25143#21517':'
     LabelPosition = lpLeft
     TabOrder = 0
-    Text = '15738889730'
   end
   object LabelEdit2: TLabeledEdit
     Left = 128
@@ -68,7 +67,6 @@ object FormLogin: TFormLogin
     ParentFont = False
     PasswordChar = '*'
     TabOrder = 1
-    Text = '12345678'
   end
   object Button1: TButton
     Left = 56

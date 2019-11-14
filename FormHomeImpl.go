@@ -41,7 +41,7 @@ func (f *TFormHome) OnFormClose(sender vcl.IObject, action *types.TCloseAction) 
 }
 func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	FormHome.SetShowInTaskBar(types.StAlways)
-	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s 线程:%d", user,thread))
+	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s 线程:%d", user, thread))
 	f.Cbbt1s2.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt1s3.SetItemIndex(0)
@@ -71,7 +71,7 @@ func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 	}
 }
 func (f *TFormHome) OnFormShow(sender vcl.IObject) {
-	fmt.Println(ck)
+	//fmt.Println(ck)
 }
 func (f *TFormHome) OnListView1Data(sender vcl.IObject, item *vcl.TListItem) {
 	f.sample_ds_lk.Lock()
@@ -104,6 +104,9 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 			f.Buttonp1s1.SetEnabled(true)
 		})
 		err := func() error {
+			if r == false {
+				return nil
+			}
 			var err error
 			f.sample_ck, err = nifdc.Sample_switchchannel(f.sample_uuid, f.sample_chs[f.Cbbt1s1.ItemIndex()].Type, ck, nil)
 			if err != nil {
@@ -634,7 +637,9 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 			f.Buttonp1s2.SetEnabled(true)
 		})
 		err := func() error {
-
+			if w == false {
+				return nil
+			}
 			if tmpds == nil || len(tmpds.Data) == 0 {
 				return errors.New("数据不能为空")
 			}
@@ -726,6 +731,9 @@ func (f *TFormHome) OnButtont2s1Click(sender vcl.IObject) {
 			f.Buttont2s1.SetEnabled(true)
 		})
 		err := func() error {
+			if r == false {
+				return nil
+			}
 			f.uploaddatas_lk.Lock()
 			f.uploaddatas = nil
 			f.uploaddatas_lk.Unlock()
@@ -828,6 +836,9 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 			f.Buttont2s2.SetEnabled(true)
 		})
 		err := func() error {
+			if r == false {
+				return nil
+			}
 			enddate := time.Now()
 			startdate := enddate.AddDate(-1, 0, 0)
 			var dds *nifdc.Api_food_getFood_r
@@ -893,6 +904,9 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 			f.Buttont2s3.SetEnabled(true)
 		})
 		err := func() error {
+			if w == false {
+				return nil
+			}
 			var tmpds []*nifdc.UploadData
 			f.uploaddatas_lk.Lock()
 			tmpds = f.uploaddatas

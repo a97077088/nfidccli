@@ -4,9 +4,15 @@
 package main
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"github.com/a97077088/nifdc"
 	"github.com/ying32/govcl/vcl"
+	"math/rand"
+	"nfidccli/proc"
+	"strconv"
+	"time"
 )
 
 //::private::
@@ -40,6 +46,53 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 			if err != nil {
 				return err
 			}
+			req := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(999999989)
+			rlogin, err := nfidcproc.Login(context.Background(), &proc.LoginReq{
+				R: enmp(map[string]string{
+					"user": u,
+					"tm":   fmt.Sprintf("%d", time.Now().UnixNano()),
+					"req":  fmt.Sprintf("%d", req),
+				}),
+			})
+			if err != nil {
+				return errors.New("授权失败")
+			}
+			mpr := demp(rlogin.R)
+			if mpr == nil {
+				return errors.New("授权失败")
+			}
+			if fmt.Sprintf("%d", req) != mpr["req"] {
+				return errors.New("授权失败")
+			}
+			sth := mpr["th"]
+			if sth == "" {
+				return errors.New("授权失败")
+			}
+			thread, err = strconv.Atoi(sth)
+			if err != nil {
+				return errors.New("授权失败")
+			}
+
+			sw := mpr["w"]
+			sr := mpr["r"]
+			if sw == "" || sr == "" {
+				return errors.New("授权失败")
+			}
+			nw, err := strconv.Atoi(sw)
+			if err != nil {
+				return errors.New("授权失败")
+			}
+			nr, err := strconv.Atoi(sr)
+			if err != nil {
+				return errors.New("授权失败")
+			}
+			if nw == 1 {
+				w = true
+			}
+			if nr == 1 {
+				r = true
+			}
+
 			user = f.LabelEdit1.Text()
 			return nil
 		}()
