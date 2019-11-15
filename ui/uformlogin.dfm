@@ -33,11 +33,11 @@ object FormLogin: TFormLogin
     ParentFont = False
   end
   object Label2: TLabel
-    Left = 159
+    Left = 167
     Top = 259
     Width = 50
     Height = 24
-    Caption = 'v0.0.1'
+    Caption = 'v0.0.2'
   end
   object LabelEdit1: TLabeledEdit
     Left = 128

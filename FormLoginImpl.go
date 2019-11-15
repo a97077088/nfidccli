@@ -93,7 +93,7 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 				r = true
 			}
 
-			user = f.LabelEdit1.Text()
+			user = u
 			return nil
 		}()
 		if err != nil {

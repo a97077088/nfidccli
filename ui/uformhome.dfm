@@ -5,6 +5,8 @@ object FormHome: TFormHome
   ClientHeight = 680
   ClientWidth = 1293
   Color = clBtnFace
+  Constraints.MinHeight = 727
+  Constraints.MinWidth = 1311
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
@@ -164,6 +166,7 @@ object FormHome: TFormHome
           Top = 8
           Width = 111
           Height = 32
+          Anchors = [akTop, akRight]
           TabOrder = 6
           Items.Strings = (
             #20840#37096#23548#20986
