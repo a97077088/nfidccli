@@ -128,7 +128,8 @@ object FormHome: TFormHome
           OnChange = Cbbt1s2Change
           Items.Strings = (
             #25277#26679#23436#25104
-            #24050#25509#25910)
+            #24050#25509#25910
+            #26816#39564#23436#25104)
         end
         object Dtpt1s2: TDateTimePicker
           Left = 251
