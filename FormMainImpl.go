@@ -41,7 +41,7 @@ func (f *TFormMain) OnButton1Click(sender vcl.IObject) {
 		if err != nil {
 			return err
 		}
-		uid, chs, err := nifdc.Sample_login(f.ck, nil)
+		uid, chs, _, err := nifdc.Sample_login(f.ck, nil)
 		f.uid = uid
 		f.chs = chs
 		f.Cbb1.Clear()
@@ -72,8 +72,8 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 
 	go func() {
 		defer f.Button2.SetEnabled(true)
-
 		err := func() error {
+
 			if f.Cbb1.ItemIndex() == -1 {
 				return errors.New("必须先选择通道")
 			}

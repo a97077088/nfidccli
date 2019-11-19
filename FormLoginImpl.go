@@ -122,6 +122,8 @@ func (f *TFormLogin) OnFormShow(sender vcl.IObject) {
 	//if rtl.FileExists("./ck") == true {
 	//	byck, _ := ioutil.ReadFile("./ck")
 	//	ck = string(byck)
+	//	w=true
+	//	r=true
 	//	FormHome.Show()
 	//	go func() {
 	//		time.Sleep(time.Millisecond * 200)

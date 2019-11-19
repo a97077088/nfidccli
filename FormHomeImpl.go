@@ -53,7 +53,7 @@ func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 		if f.sample_init == true {
 			return nil
 		}
-		f.sample_uuid, f.sample_chs, err = nifdc.Sample_login(ck, nil)
+		f.sample_uuid, f.sample_chs, f.sample_ck, err = nifdc.Sample_login(ck, nil)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 }
 func (f *TFormHome) OnFormShow(sender vcl.IObject) {
 	//fmt.Println(ck)
-	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s ", user,))
+	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s ", user))
 }
 func (f *TFormHome) OnListView1Data(sender vcl.IObject, item *vcl.TListItem) {
 	f.sample_ds_lk.Lock()
@@ -108,10 +108,14 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 				return nil
 			}
 			var err error
-			f.sample_ck, err = nifdc.Sample_switchchannel(f.sample_uuid, f.sample_chs[f.Cbbt1s1.ItemIndex()].Type, ck, nil)
-			if err != nil {
-				return err
+			if len(f.sample_chs) != 0 {
+				ch := f.sample_chs[f.Cbbt1s1.ItemIndex()].Type
+				f.sample_ck, err = nifdc.Sample_switchchannel(f.sample_uuid, ch, ck, nil)
+				if err != nil {
+					return err
+				}
 			}
+
 			sd := f.Dtpt1s1.Date().Format("2006-01-02")
 			ed := f.Dtpt1s2.Date().Format("2006-01-02")
 			tmpds, err := nifdc.DownData(state, sd, ed, f.sample_ck, nil)
