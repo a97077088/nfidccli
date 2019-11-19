@@ -426,7 +426,8 @@ func (f *TFormHome) ExportJianyanwancheng_full(thread int, data []*nifdc.Data_o,
 	xlsx.SetCellValue(xlsxsheet, "BY1", "备注")
 
 	th := threadpool.NewThreadPool(thread, len(data))
-	for _, d := range data {
+	for idx, d := range data {
+		fmt.Println(idx)
 		_d := d
 		th.Req(func() interface{} {
 			itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
