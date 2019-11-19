@@ -53,10 +53,12 @@ func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 		if f.sample_init == true {
 			return nil
 		}
-		f.sample_uuid, f.sample_chs, f.sample_ck, err = nifdc.Sample_login(ck, nil)
+		tmpck := ""
+		f.sample_uuid, f.sample_chs, tmpck, err = nifdc.Sample_login(ck, nil)
 		if err != nil {
 			return err
 		}
+		f.sample_ck = fmt.Sprintf("%s;%s", ck, tmpck)
 		f.Cbbt1s1.Items().Clear()
 		for _, ch := range f.sample_chs {
 			f.Cbbt1s1.Items().Add(ch.Name)
@@ -114,6 +116,13 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 				if err != nil {
 					return err
 				}
+			} else {
+				tmpck := ""
+				f.sample_uuid, f.sample_chs, tmpck, err = nifdc.Sample_login(ck, nil)
+				if err != nil {
+					return err
+				}
+				f.sample_ck = fmt.Sprintf("%s;%s", ck, tmpck)
 			}
 
 			sd := f.Dtpt1s1.Date().Format("2006-01-02")
