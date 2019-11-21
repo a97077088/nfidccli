@@ -40,6 +40,10 @@ type
     Gauge2: TGauge;
     DlgOpen1: TOpenDialog;
     Cbbt1s3: TComboBox;
+    Label2: TLabel;
+    Edtt1s1: TEdit;
+    Edtt2s1: TEdit;
+    Label7: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Tss1Show(Sender: TObject);

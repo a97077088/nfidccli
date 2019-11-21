@@ -13,6 +13,7 @@ import (
 	"github.com/a97077088/threadpool"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
+	"net/url"
 	"regexp"
 	"sync"
 	"sync/atomic"
@@ -100,9 +101,10 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 	if f.Cbbt1s2.ItemIndex() == 1 {
 		state = 5
 	}
-	if f.Cbbt1s2.ItemIndex()==2{
+	if f.Cbbt1s2.ItemIndex() == 2 {
 		state = 12
 	}
+	resource_org_id := f.Edtt1s1.Text()
 	f.Buttonp1s1.SetEnabled(false)
 	go func() {
 		defer vcl.ThreadSync(func() {
@@ -130,7 +132,7 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 
 			sd := f.Dtpt1s1.Date().Format("2006-01-02")
 			ed := f.Dtpt1s2.Date().Format("2006-01-02")
-			tmpds, err := nifdc.DownData(state, sd, ed, f.sample_ck, nil)
+			tmpds, err := nifdc.DownData(resource_org_id, state, sd, ed, f.sample_ck, nil)
 			if err != nil {
 				return err
 			}
@@ -345,7 +347,6 @@ func (f *TFormHome) Exportjianyanwancheng_full(thread int, data []*nifdc.Data_o,
 	}
 	return nil
 }
-
 
 //导出已接收
 func (f *TFormHome) Exportyijieshou(thread int, data []*nifdc.Data_o, fname string) error {
@@ -1047,7 +1048,7 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 	if f.Cbbt2s1.ItemIndex() == 1 {
 		tp = 1
 	}
-
+	taskfrom := url.QueryEscape(f.Edtt2s1.Text())
 	f.Buttont2s2.SetEnabled(false)
 	go func() {
 		defer vcl.ThreadSync(func() {
@@ -1062,13 +1063,13 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 			var dds *nifdc.Api_food_getFood_r
 			var err error
 			if tp == 0 {
-				dds, err = nifdc.Test_platform_api_food_getFood(startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_food_getFood(taskfrom, startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
 			}
 			if tp == 1 {
-				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
@@ -1229,7 +1230,7 @@ func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
 		f.Cbbt1s3.Items().Add("模式1")
 	} else if f.Cbbt1s2.Text() == "已接收" {
 		f.Cbbt1s3.Items().Add("全部导出")
-	}else if f.Cbbt1s2.Text() == "检验完成" {
+	} else if f.Cbbt1s2.Text() == "检验完成" {
 		f.Cbbt1s3.Items().Add("全部导出")
 	}
 	f.Cbbt1s3.SetItemIndex(0)

@@ -26,7 +26,7 @@ object FormHome: TFormHome
     Width = 1287
     Height = 667
     Margins.Top = 10
-    ActivePage = Tss1
+    ActivePage = Tss2
     Align = alClient
     TabOrder = 0
     object Tss1: TTabSheet
@@ -45,14 +45,14 @@ object FormHome: TFormHome
         Left = 0
         Top = 0
         Width = 1279
-        Height = 57
+        Height = 89
         Align = alTop
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
         DesignSize = (
           1279
-          57)
+          89)
         object Label3: TLabel
           Left = 462
           Top = 11
@@ -82,6 +82,14 @@ object FormHome: TFormHome
           Width = 8
           Height = 24
           Caption = '-'
+        end
+        object Label2: TLabel
+          Left = 15
+          Top = 56
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #20219#21153#26469#28304':'
         end
         object Cbbt1s1: TComboBox
           Left = 544
@@ -173,13 +181,20 @@ object FormHome: TFormHome
             #20840#37096#23548#20986
             #27169#24335'1')
         end
+        object Edtt1s1: TEdit
+          Left = 97
+          Top = 54
+          Width = 291
+          Height = 32
+          TabOrder = 7
+        end
       end
       object ListView1: TListView
         AlignWithMargins = True
         Left = 3
-        Top = 60
+        Top = 92
         Width = 1273
-        Height = 524
+        Height = 492
         Align = alClient
         Columns = <
           item
@@ -230,6 +245,8 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView1Data
         OnResize = ListView1Resize
+        ExplicitTop = 60
+        ExplicitHeight = 524
       end
     end
     object Tss2: TTabSheet
@@ -249,14 +266,14 @@ object FormHome: TFormHome
         Left = 0
         Top = 0
         Width = 1279
-        Height = 57
+        Height = 89
         Align = alTop
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
         DesignSize = (
           1279
-          57)
+          89)
         object Labelt2s1: TLabel
           Left = 128
           Top = 16
@@ -272,8 +289,16 @@ object FormHome: TFormHome
           Anchors = [akTop, akRight]
           Caption = #21305#37197#32467#26524': '
         end
+        object Label7: TLabel
+          Left = 46
+          Top = 57
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #20219#21153#26469#28304':'
+        end
         object Buttont2s1: TButton
-          Left = 19
+          Left = 33
           Top = 8
           Width = 89
           Height = 38
@@ -313,13 +338,20 @@ object FormHome: TFormHome
           TabOrder = 3
           OnClick = Buttont2s3Click
         end
+        object Edtt2s1: TEdit
+          Left = 128
+          Top = 53
+          Width = 291
+          Height = 32
+          TabOrder = 4
+        end
       end
       object ListView2: TListView
         AlignWithMargins = True
         Left = 3
-        Top = 60
+        Top = 92
         Width = 1273
-        Height = 524
+        Height = 492
         Align = alClient
         Checkboxes = True
         Columns = <
@@ -391,6 +423,8 @@ object FormHome: TFormHome
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
+        ExplicitTop = 60
+        ExplicitHeight = 524
       end
     end
     object Tss3: TTabSheet

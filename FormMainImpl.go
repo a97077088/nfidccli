@@ -82,7 +82,7 @@ func (f *TFormMain) OnButton2Click(sender vcl.IObject) {
 			if err != nil {
 				return err
 			}
-			dt, err := nifdc.DownData(4, f.ck, "", "", nil)
+			dt, err := nifdc.DownData("", 4, f.ck, "", "", nil)
 			if err != nil {
 				return err
 			}
@@ -202,7 +202,7 @@ func (f *TFormMain) OnButton3Click(sender vcl.IObject) {
 			if err != nil {
 				return err
 			}
-			dt, err := nifdc.DownData(4, f.ck, "", "", nil)
+			dt, err := nifdc.DownData("", 4, f.ck, "", "", nil)
 			if err != nil {
 				return err
 			}
@@ -419,7 +419,7 @@ func (f *TFormMain) OnButton4Click(sender vcl.IObject) {
 			if err != nil {
 				return err
 			}
-			dt, err := nifdc.DownData(5, f.ck, "", "", nil)
+			dt, err := nifdc.DownData("", 5, f.ck, "", "", nil)
 			if err != nil {
 				return err
 			}
