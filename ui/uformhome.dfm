@@ -26,7 +26,7 @@ object FormHome: TFormHome
     Width = 1287
     Height = 667
     Margins.Top = 10
-    ActivePage = Tss2
+    ActivePage = Tss1
     Align = alClient
     TabOrder = 0
     object Tss1: TTabSheet
@@ -245,8 +245,6 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView1Data
         OnResize = ListView1Resize
-        ExplicitTop = 60
-        ExplicitHeight = 524
       end
     end
     object Tss2: TTabSheet
@@ -423,22 +421,22 @@ object FormHome: TFormHome
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
-        ExplicitTop = 60
-        ExplicitHeight = 524
       end
     end
     object Tss3: TTabSheet
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 1279
-        Height = 628
+        Width = 90
+        Height = 24
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
-        ExplicitWidth = 90
-        ExplicitHeight = 24
       end
     end
   end
