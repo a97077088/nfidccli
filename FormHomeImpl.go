@@ -873,13 +873,17 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 					}
 				}
 			}
-			if sel == 1 { //导出
-				err := f.Exportyijieshou(thread, tmpds.Data, fname)
-				if err != nil {
-					return err
+			if sel == 1 { //导出已接收
+				if ssel==0{ //导出已接收全部到excel
+					err := f.Exportyijieshou(thread, tmpds.Data, fname)
+					if err != nil {
+						return err
+					}
+				}else if ssel==1{
+					return errors.New("不支持的模式")
 				}
 			}
-			if sel == 2 { //导出
+			if sel == 2 { //导出检验完成
 				err := f.Exportjianyanwancheng_full(thread, tmpds.Data, fname)
 				if err != nil {
 					return err
@@ -1226,12 +1230,13 @@ func (f *TFormHome) OnListView2DblClick(sender vcl.IObject) {
 func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
 	f.Cbbt1s3.Clear()
 	if f.Cbbt1s2.Text() == "抽样完成" {
-		f.Cbbt1s3.Items().Add("全部导出")
-		f.Cbbt1s3.Items().Add("模式1")
+		f.Cbbt1s3.Items().Add("导出excel")
+		f.Cbbt1s3.Items().Add("导出excel模式1")
 	} else if f.Cbbt1s2.Text() == "已接收" {
-		f.Cbbt1s3.Items().Add("全部导出")
+		f.Cbbt1s3.Items().Add("导出excel")
+		f.Cbbt1s3.Items().Add("导出sql")
 	} else if f.Cbbt1s2.Text() == "检验完成" {
-		f.Cbbt1s3.Items().Add("全部导出")
+		f.Cbbt1s3.Items().Add("导出excel")
 	}
 	f.Cbbt1s3.SetItemIndex(0)
 }

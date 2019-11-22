@@ -9,8 +9,12 @@ import (
 	"fmt"
 	"github.com/a97077088/nifdc"
 	"github.com/ying32/govcl/vcl"
+	"github.com/ying32/govcl/vcl/rtl"
+	"io/ioutil"
 	"math/rand"
+	"nfidccli/models"
 	"nfidccli/proc"
+	"os"
 	"strconv"
 	"time"
 )
@@ -103,7 +107,9 @@ func (f *TFormLogin) OnButton1Click(sender vcl.IObject) {
 			return
 		}
 		vcl.ThreadSync(func() {
-			//ioutil.WriteFile("./ck", []byte(ck), os.ModePerm)
+			if debug==true{
+				ioutil.WriteFile("./ck", []byte(ck), os.ModePerm)
+			}
 			FormLogin.Hide()
 			FormHome.Show()
 		})
@@ -119,18 +125,29 @@ func (f *TFormLogin) OnFormCreate(sender vcl.IObject) {
 }
 
 func (f *TFormLogin) OnFormShow(sender vcl.IObject) {
-	//if rtl.FileExists("./ck") == true {
-	//	byck, _ := ioutil.ReadFile("./ck")
-	//	ck = string(byck)
-	//	w=true
-	//	r=true
-	//	FormHome.Show()
-	//	go func() {
-	//		time.Sleep(time.Millisecond * 200)
-	//		vcl.ThreadSync(func() {
-	//			f.Hide()
-	//		})
-	//	}()
-	//	return
-	//}
+	fmt.Println(models.InitDb("122.51.93.214",1433,"sa","haosql","testdb"))
+
+	n:=0
+	fmt.Scanf("%d",&n)
+	c:=models.Jianyanxiangmu{}
+	fmt.Println(models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?","BPJC2019041804").Select("top 1 *").Scan(&c).Error)
+	fmt.Println(c)
+	fmt.Println(c.V抽样委托单号)
+	if debug==true{
+		if rtl.FileExists("./ck") == true {
+			byck, _ := ioutil.ReadFile("./ck")
+			ck = string(byck)
+			w=true
+			r=true
+			thread=1
+			FormHome.Show()
+			go func() {
+				time.Sleep(time.Millisecond * 200)
+				vcl.ThreadSync(func() {
+					f.Hide()
+				})
+			}()
+			return
+		}
+	}
 }
