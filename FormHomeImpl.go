@@ -14,6 +14,7 @@ import (
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"net/url"
+	"nfidccli/models"
 	"regexp"
 	"sync"
 	"sync/atomic"
@@ -43,9 +44,9 @@ func (f *TFormHome) OnFormClose(sender vcl.IObject, action *types.TCloseAction) 
 func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	FormHome.SetShowInTaskBar(types.StAlways)
 	f.Cbbt1s2.SetItemIndex(0)
-	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt1s3.SetItemIndex(0)
-	f.Dtpt1s1.SetDate(time.Now().AddDate(0, 0, -1))
+	f.Cbbt2s1.SetItemIndex(0)
+	f.Dtpt1s1.SetDate(time.Now().AddDate(0, -1, 0))
 	f.Dtpt1s2.SetDate(time.Now())
 }
 func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
@@ -74,6 +75,15 @@ func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
 }
 func (f *TFormHome) OnFormShow(sender vcl.IObject) {
 	//fmt.Println(ck)
+	f.Edtt1s1.SetText("郑州")
+	f.Cbbt1s1.SetItemIndex(2)
+	f.Cbbt1s2.SetItemIndex(1)
+	go func() {
+		vcl.ThreadSync(func() {
+			f.Cbbt1s3.SetItemIndex(1)
+		})
+	}()
+
 	f.SetCaption(fmt.Sprintf("数据同步组件 当前账号:%s ", user))
 }
 func (f *TFormHome) OnListView1Data(sender vcl.IObject, item *vcl.TListItem) {
@@ -541,6 +551,59 @@ func (f *TFormHome) Exportyijieshou(thread int, data []*nifdc.Data_o, fname stri
 	return nil
 }
 
+//导出已接收到sql
+func (f *TFormHome) Exportyijieshou_sql(thread int, data []*nifdc.Data_o, fname string) error {
+	if models.Ctx()==nil{
+		return errors.New("数据库未配置")
+	}
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
+			})
+			itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+				tr, err := nifdc.Viewcheckedsample_full(_d.Sample_code, f.sample_ck, nil)
+				if err != nil {
+					return nil, err
+				}
+				return tr, nil
+			})
+			if err != nil {
+				fmt.Println(err)
+				return nil
+			}
+			tr := itr.(map[string]string)
+			cn:=0
+			err=models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?",tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
+			if err!=nil{
+				fmt.Println(err)
+				return nil
+			}
+			if cn!=0{
+				//已导入的跳过
+				return nil
+			}
+			err=models.Ctx().Create(&models.Jianyanxiangmu{
+				Id:      models.Build_id(),
+				V任务编号:   models.Build_taskid(),
+				V抽样委托单号: tr["抽样基础信息_抽样单编号"],
+			}).Error
+			if err!=nil{
+				fmt.Println(err)
+				return nil
+			}
+
+
+			return nil
+		})
+
+	}
+	th.Wait()
+	return nil
+}
+
 //导出抽样完成全部
 func (f *TFormHome) Exportchouyangwancheng_full(thread int, data []*nifdc.Data_o, fname string) error {
 	xlsxsheet := "Sheet1"
@@ -835,9 +898,14 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 
 	sel := int(f.Cbbt1s2.ItemIndex())  //任务状态
 	ssel := int(f.Cbbt1s3.ItemIndex()) //导出模式
-	if f.SaveDialog1.Execute() == false {
-		return
+	if sel==1&&ssel==1{
+		//sql模式不弹窗
+	}else{
+		if f.SaveDialog1.Execute() == false {
+			return
+		}
 	}
+
 	fname := f.SaveDialog1.FileName()
 
 	f.sample_ds_lk.Lock()
@@ -880,7 +948,10 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 						return err
 					}
 				}else if ssel==1{
-					return errors.New("不支持的模式")
+					err := f.Exportyijieshou_sql(thread,tmpds.Data,fname)
+					if err != nil {
+						return err
+					}
 				}
 			}
 			if sel == 2 { //导出检验完成

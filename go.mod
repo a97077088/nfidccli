@@ -2,7 +2,7 @@ module nfidccli
 
 go 1.13
 
-replace github.com/a97077088/nifdc => c:\src\src\nifdc
+replace github.com/a97077088/nifdc => ../nifdc
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
@@ -19,7 +19,9 @@ require (
 	github.com/jinzhu/gorm v1.9.12-0.20191119080800-59408390c2dc
 	github.com/lunny/godbc v0.0.0-20131220142036-57f94ee1eb13
 	github.com/mattn/go-adodb v0.0.2-0.20190606060040-d9c4491c0a19
+	github.com/satori/go.uuid v1.2.0
 	github.com/ying32/govcl v1.2.6-beta.3.0.20190821083642-391d3098431a
-	google.golang.org/grpc v1.19.0
+	golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e // indirect
+	google.golang.org/grpc v1.25.1
 	xorm.io/xorm v0.8.1-0.20191114064943-c349d36e950a
 )

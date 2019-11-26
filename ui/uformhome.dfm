@@ -2,7 +2,7 @@ object FormHome: TFormHome
   Left = 0
   Top = 0
   Caption = #20219#21153#24179#21488
-  ClientHeight = 680
+  ClientHeight = 682
   ClientWidth = 1338
   Color = clBtnFace
   Constraints.MinHeight = 727
@@ -24,24 +24,21 @@ object FormHome: TFormHome
     Left = 3
     Top = 10
     Width = 1332
-    Height = 667
+    Height = 669
     Margins.Top = 10
     ActivePage = Tss1
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 1287
     object Tss1: TTabSheet
       Caption = #19979#36733#26679#21697#20449#24687
       OnShow = Tss1Show
-      ExplicitWidth = 1279
       object Gauge1: TGauge
         Left = 0
-        Top = 587
+        Top = 589
         Width = 1324
         Height = 41
         Align = alBottom
         Progress = 0
-        ExplicitTop = 589
         ExplicitWidth = 1279
       end
       object Pnl2: TPanel
@@ -53,7 +50,6 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
-        ExplicitWidth = 1279
         DesignSize = (
           1324
           89)
@@ -173,7 +169,6 @@ object FormHome: TFormHome
           Caption = #23548#20986
           TabOrder = 5
           OnClick = Buttonp1s2Click
-          ExplicitLeft = 1178
         end
         object Cbbt1s3: TComboBox
           Left = 1082
@@ -199,7 +194,7 @@ object FormHome: TFormHome
         Left = 3
         Top = 92
         Width = 1318
-        Height = 492
+        Height = 494
         Align = alClient
         Columns = <
           item
@@ -250,21 +245,23 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView1Data
         OnResize = ListView1Resize
-        ExplicitWidth = 1273
       end
     end
     object Tss2: TTabSheet
       Caption = #19978#20256#26816#39564#32467#26524
       ImageIndex = 1
       OnShow = Tss2Show
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Gauge2: TGauge
         Left = 0
-        Top = 587
+        Top = 589
         Width = 1324
         Height = 41
         Align = alBottom
         Progress = 0
-        ExplicitTop = 589
         ExplicitWidth = 1279
       end
       object Pnl1: TPanel
@@ -357,7 +354,7 @@ object FormHome: TFormHome
         Left = 3
         Top = 92
         Width = 1318
-        Height = 492
+        Height = 494
         Align = alClient
         Checkboxes = True
         Columns = <
@@ -429,20 +426,23 @@ object FormHome: TFormHome
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
+        ExplicitHeight = 492
       end
     end
     object Tss3: TTabSheet
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 1324
-        Height = 628
+        Width = 90
+        Height = 24
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
-        ExplicitWidth = 90
-        ExplicitHeight = 24
       end
     end
   end

@@ -126,13 +126,15 @@ func (f *TFormLogin) OnFormCreate(sender vcl.IObject) {
 
 func (f *TFormLogin) OnFormShow(sender vcl.IObject) {
 	fmt.Println(models.InitDb("122.51.93.214",1433,"sa","haosql","testdb"))
-
-	n:=0
-	fmt.Scanf("%d",&n)
-	c:=models.Jianyanxiangmu{}
-	fmt.Println(models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?","BPJC2019041804").Select("top 1 *").Scan(&c).Error)
-	fmt.Println(c)
-	fmt.Println(c.V抽样委托单号)
+	//c:=models.Jianyanxiangmu{}
+	//fmt.Println(models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?","BPJC2019041804").Select("top 1 *").Scan(&c).Error)
+	//fmt.Println(c)
+	//fmt.Println(c.V抽样委托单号)
+	//models.Ctx().Model(&models.Jianyanxiangmu{}).Create(&models.Jianyanxiangmu{
+	//	Id:models.Build_id(),
+	//	V任务编号:models.Build_taskid(),
+	//	V抽样委托单号:"抽样单号1111",
+	//})
 	if debug==true{
 		if rtl.FileExists("./ck") == true {
 			byck, _ := ioutil.ReadFile("./ck")
