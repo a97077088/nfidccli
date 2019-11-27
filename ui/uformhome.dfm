@@ -26,9 +26,11 @@ object FormHome: TFormHome
     Width = 1332
     Height = 669
     Margins.Top = 10
-    ActivePage = Tss1
+    ActivePage = Tss3
     Align = alClient
     TabOrder = 0
+    ExplicitLeft = -2
+    ExplicitTop = 5
     object Tss1: TTabSheet
       Caption = #19979#36733#26679#21697#20449#24687
       OnShow = Tss1Show
@@ -54,10 +56,11 @@ object FormHome: TFormHome
           1324
           89)
         object Label3: TLabel
-          Left = 483
-          Top = 11
+          Left = 1038
+          Top = 57
           Width = 76
           Height = 24
+          Alignment = taRightJustify
           Anchors = [akTop, akRight]
           Caption = #36873#25321#31995#32479':'
         end
@@ -66,6 +69,7 @@ object FormHome: TFormHome
           Top = 11
           Width = 76
           Height = 24
+          Alignment = taRightJustify
           Anchors = [akTop, akRight]
           Caption = #20219#21153#29366#24577':'
         end
@@ -74,6 +78,7 @@ object FormHome: TFormHome
           Top = 11
           Width = 76
           Height = 24
+          Alignment = taRightJustify
           Caption = #25277#26679#26085#26399':'
         end
         object Label6: TLabel
@@ -92,8 +97,8 @@ object FormHome: TFormHome
           Caption = #20219#21153#26469#28304':'
         end
         object Cbbt1s1: TComboBox
-          Left = 565
-          Top = 8
+          Left = 1120
+          Top = 54
           Width = 192
           Height = 32
           Anchors = [akTop, akRight]
@@ -251,10 +256,6 @@ object FormHome: TFormHome
       Caption = #19978#20256#26816#39564#32467#26524
       ImageIndex = 1
       OnShow = Tss2Show
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Gauge2: TGauge
         Left = 0
         Top = 589
@@ -277,42 +278,56 @@ object FormHome: TFormHome
           1324
           89)
         object Labelt2s1: TLabel
-          Left = 128
-          Top = 16
+          Left = 411
+          Top = 10
           Width = 76
           Height = 24
           Caption = #22635#25253#31867#22411':'
         end
         object Labelt2s2: TLabel
-          Left = 835
-          Top = 17
+          Left = 860
+          Top = 54
           Width = 81
           Height = 24
           Anchors = [akTop, akRight]
           Caption = #21305#37197#32467#26524': '
-          ExplicitLeft = 790
         end
         object Label7: TLabel
-          Left = 46
-          Top = 57
+          Left = 14
+          Top = 55
           Width = 76
           Height = 24
           Alignment = taRightJustify
           Caption = #20219#21153#26469#28304':'
         end
+        object Label9: TLabel
+          Left = 14
+          Top = 11
+          Width = 76
+          Height = 24
+          Caption = #25277#26679#26085#26399':'
+        end
+        object Label13: TLabel
+          Left = 237
+          Top = 11
+          Width = 8
+          Height = 24
+          Caption = '-'
+        end
         object Buttont2s1: TButton
-          Left = 33
-          Top = 8
+          Left = 1116
+          Top = 4
           Width = 89
           Height = 38
+          Anchors = [akTop, akRight]
           Caption = #23548#20837'excel'
           TabOrder = 0
           OnClick = Buttont2s1Click
         end
         object Cbbt2s1: TComboBox
-          Left = 210
-          Top = 11
-          Width = 145
+          Left = 493
+          Top = 7
+          Width = 192
           Height = 32
           DoubleBuffered = False
           ParentDoubleBuffered = False
@@ -322,8 +337,8 @@ object FormHome: TFormHome
             #20892#20135#21697#19978#25253)
         end
         object Buttont2s2: TButton
-          Left = 740
-          Top = 8
+          Left = 1004
+          Top = 4
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -333,7 +348,7 @@ object FormHome: TFormHome
         end
         object Buttont2s3: TButton
           Left = 1224
-          Top = 8
+          Top = 4
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -342,11 +357,33 @@ object FormHome: TFormHome
           OnClick = Buttont2s3Click
         end
         object Edtt2s1: TEdit
-          Left = 128
+          Left = 97
           Top = 53
           Width = 291
           Height = 32
           TabOrder = 4
+        end
+        object Dtpt2s1: TDateTimePicker
+          Left = 97
+          Top = 8
+          Width = 135
+          Height = 32
+          Date = 43781.000000000000000000
+          Time = 0.933494293982221300
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
+          TabOrder = 5
+        end
+        object Dtpt2s2: TDateTimePicker
+          Left = 251
+          Top = 8
+          Width = 137
+          Height = 32
+          Date = 43781.000000000000000000
+          Time = 0.934004062502936000
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
+          TabOrder = 6
         end
       end
       object ListView2: TListView
@@ -426,23 +463,330 @@ object FormHome: TFormHome
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
-        ExplicitHeight = 492
       end
     end
     object Tss3: TTabSheet
+      Caption = #19979#36733#26816#39564#32467#26524
+      ImageIndex = 3
+      OnShow = Tss3Show
+      object Gauge3: TGauge
+        Left = 0
+        Top = 589
+        Width = 1324
+        Height = 41
+        Align = alBottom
+        Progress = 0
+        ExplicitWidth = 1279
+      end
+      object Panel1: TPanel
+        Left = 0
+        Top = 0
+        Width = 1324
+        Height = 89
+        Align = alTop
+        Caption = 'Pnl1'
+        ShowCaption = False
+        TabOrder = 0
+        DesignSize = (
+          1324
+          89)
+        object Label8: TLabel
+          Left = 411
+          Top = 10
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #22635#25253#31867#22411':'
+        end
+        object Label10: TLabel
+          Left = 14
+          Top = 11
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #25277#26679#26085#26399':'
+        end
+        object Label11: TLabel
+          Left = 237
+          Top = 11
+          Width = 8
+          Height = 24
+          Caption = '-'
+        end
+        object Label12: TLabel
+          Left = 15
+          Top = 56
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #20219#21153#26469#28304':'
+        end
+        object Label14: TLabel
+          Left = 411
+          Top = 56
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #20219#21153#29366#24577':'
+        end
+        object Label15: TLabel
+          Left = 707
+          Top = 10
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #25490#24207#23383#27573':'
+        end
+        object Label16: TLabel
+          Left = 707
+          Top = 57
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #25490#24207#35268#21017':'
+        end
+        object Cbbt3s1: TComboBox
+          Left = 493
+          Top = 7
+          Width = 192
+          Height = 32
+          DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
+          ParentDoubleBuffered = False
+          ParentFont = False
+          TabOrder = 0
+          Items.Strings = (
+            #26222#36890#39135#21697#19978#25253
+            #20892#20135#21697#19978#25253)
+        end
+        object Dtpt3s1: TDateTimePicker
+          Left = 97
+          Top = 8
+          Width = 135
+          Height = 32
+          Date = 43781.000000000000000000
+          Time = 0.933494293982221300
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
+          TabOrder = 1
+        end
+        object Dtpt3s2: TDateTimePicker
+          Left = 251
+          Top = 8
+          Width = 137
+          Height = 32
+          Date = 43781.000000000000000000
+          Time = 0.934004062502936000
+          DoubleBuffered = False
+          ParentDoubleBuffered = False
+          TabOrder = 2
+        end
+        object Buttonp3s1: TButton
+          Left = 1107
+          Top = 4
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #26597#35810
+          TabOrder = 3
+          OnClick = Buttonp3s1Click
+        end
+        object Buttonp3s2: TButton
+          Left = 1223
+          Top = 4
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #23548#20986
+          TabOrder = 4
+          OnClick = Buttonp3s2Click
+        end
+        object Edtt3s1: TEdit
+          Left = 97
+          Top = 54
+          Width = 291
+          Height = 32
+          TabOrder = 5
+        end
+        object Cbbt3s2: TComboBox
+          Left = 493
+          Top = 54
+          Width = 192
+          Height = 32
+          DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
+          ParentDoubleBuffered = False
+          ParentFont = False
+          TabOrder = 6
+          Items.Strings = (
+            #20840#37096
+            #24453#22635#25253
+            #24453#23457#26680
+            #24453#25209#20934
+            #24453#21457#36865
+            #24050#23436#20840#25552#20132
+            #24050#36864#20462
+            #19981#21512#26684'/'#38382#39064)
+        end
+        object Cbbt3s3: TComboBox
+          Left = 789
+          Top = 7
+          Width = 192
+          Height = 32
+          DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
+          ParentDoubleBuffered = False
+          ParentFont = False
+          TabOrder = 7
+          Items.Strings = (
+            ''
+            #25277#26679#26085#26399
+            #25277#26679#32534#21495
+            #26356#26032#26102#38388
+            #32467#35770)
+        end
+        object Cbbt3s4: TComboBox
+          Left = 789
+          Top = 54
+          Width = 192
+          Height = 32
+          DoubleBuffered = False
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -18
+          Font.Name = #24494#36719#38597#40657
+          Font.Style = []
+          ParentDoubleBuffered = False
+          ParentFont = False
+          TabOrder = 8
+          Items.Strings = (
+            #22823#22312#21069
+            #23567#22312#21069)
+        end
+      end
+      object ListView3: TListView
+        AlignWithMargins = True
+        Left = 3
+        Top = 92
+        Width = 1318
+        Height = 494
+        Align = alClient
+        Checkboxes = True
+        Columns = <
+          item
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #25277#26679#26085#26399
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #26679#21697#21040#36798#26085#26399
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #36317#31163#25910#26816#24037#20316#26085
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #25277#26679#32534#21495
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #26356#26032#26102#38388
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #30465#20221
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #26679#21697#21517#31216
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #20219#21153#26469#28304
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #20219#21153#24615#36136
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #37319#26679#21333#20301#21517#31216
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #26816#39564#26426#26500#21517#31216
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #32467#35770
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #23548#20986#29366#24577
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #23548#20986#32467#26524
+          end>
+        DoubleBuffered = True
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #24494#36719#38597#40657
+        Font.Style = []
+        GridLines = True
+        OwnerData = True
+        RowSelect = True
+        ParentDoubleBuffered = False
+        ParentFont = False
+        TabOrder = 1
+        ViewStyle = vsReport
+        OnData = ListView3Data
+        OnResize = ListView3Resize
+        ExplicitHeight = 535
+      end
+    end
+    object Tss4: TTabSheet
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 90
-        Height = 24
+        Width = 1324
+        Height = 630
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
+        ExplicitWidth = 90
+        ExplicitHeight = 24
       end
     end
   end

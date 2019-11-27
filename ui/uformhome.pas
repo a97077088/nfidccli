@@ -12,7 +12,7 @@ type
     Pgc1: TPageControl;
     Tss1: TTabSheet;
     Tss2: TTabSheet;
-    Tss3: TTabSheet;
+    Tss4: TTabSheet;
     Pnl2: TPanel;
     Label3: TLabel;
     Label4: TLabel;
@@ -44,6 +44,30 @@ type
     Edtt1s1: TEdit;
     Edtt2s1: TEdit;
     Label7: TLabel;
+    Tss3: TTabSheet;
+    Panel1: TPanel;
+    Label8: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Cbbt3s1: TComboBox;
+    Dtpt3s1: TDateTimePicker;
+    Dtpt3s2: TDateTimePicker;
+    Buttonp3s1: TButton;
+    Buttonp3s2: TButton;
+    Edtt3s1: TEdit;
+    ListView3: TListView;
+    Gauge3: TGauge;
+    Label9: TLabel;
+    Dtpt2s1: TDateTimePicker;
+    Label13: TLabel;
+    Dtpt2s2: TDateTimePicker;
+    Label14: TLabel;
+    Cbbt3s2: TComboBox;
+    Cbbt3s3: TComboBox;
+    Label15: TLabel;
+    Cbbt3s4: TComboBox;
+    Label16: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Tss1Show(Sender: TObject);
@@ -61,6 +85,11 @@ type
     procedure Buttont2s3Click(Sender: TObject);
     procedure ListView2DblClick(Sender: TObject);
     procedure Cbbt1s2Change(Sender: TObject);
+    procedure ListView3Resize(Sender: TObject);
+    procedure ListView3Data(Sender: TObject; Item: TListItem);
+    procedure Buttonp3s1Click(Sender: TObject);
+    procedure Tss3Show(Sender: TObject);
+    procedure Buttonp3s2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -80,6 +109,16 @@ begin
 end;
 
 procedure TFormHome.Buttonp1s2Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp3s1Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp3s2Click(Sender: TObject);
 begin
 //
 end;
@@ -144,6 +183,16 @@ begin
 //
 end;
 
+procedure TFormHome.ListView3Data(Sender: TObject; Item: TListItem);
+begin
+//
+end;
+
+procedure TFormHome.ListView3Resize(Sender: TObject);
+begin
+//
+end;
+
 procedure TFormHome.Timer1Timer(Sender: TObject);
 begin
 //
@@ -155,6 +204,11 @@ begin
 end;
 
 procedure TFormHome.Tss2Show(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Tss3Show(Sender: TObject);
 begin
 //
 end;

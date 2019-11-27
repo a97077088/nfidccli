@@ -13,6 +13,7 @@ require (
 	github.com/a97077088/nifdc v0.0.0-20191019115534-5cd00a9a9ab5
 	github.com/a97077088/threadpool v0.0.0-20190925091556-2981d99ff157
 	github.com/alexbrainman/odbc v0.0.0-20190102080306-cf37ce290779
+	github.com/bastengao/chinese-holidays-go v0.0.0-20191122025511-79dd3c1351fb
 	github.com/denisenkom/go-mssqldb v0.0.0-20191001013358-cfbb681360f0
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/golang/protobuf v1.3.3-0.20191022195553-ed6926b37a63

@@ -11,6 +11,7 @@ import (
 	"github.com/a97077088/nettool"
 	"github.com/a97077088/nifdc"
 	"github.com/a97077088/threadpool"
+	"github.com/bastengao/chinese-holidays-go/holidays"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"net/url"
@@ -26,13 +27,16 @@ type TFormHomeFields struct {
 	sample_uuid  string
 	sample_type  string
 	sample_chs   []*nifdc.Channel
-	sample_ds    *nifdc.Download_Data_r
+	sample_ds    []*nifdc.Data_o
 	sample_ds_lk sync.Mutex
 	sample_init  bool
 	sample_ck    string
 
 	uploaddatas    []*nifdc.UploadData
 	uploaddatas_lk sync.Mutex
+
+	getFood_ds    []*nifdc.Api_food_getFood_o
+	getFood_ds_lk sync.Mutex
 
 	test_platform_init bool
 	test_platform_ck   string
@@ -46,6 +50,10 @@ func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	f.Cbbt1s2.SetItemIndex(0)
 	f.Cbbt1s3.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
+	f.Cbbt3s1.SetItemIndex(0)
+	f.Cbbt3s2.SetItemIndex(0)
+	f.Cbbt3s3.SetItemIndex(0)
+	f.Cbbt3s4.SetItemIndex(0)
 	f.Dtpt1s1.SetDate(time.Now().AddDate(0, -1, 0))
 	f.Dtpt1s2.SetDate(time.Now())
 }
@@ -90,10 +98,10 @@ func (f *TFormHome) OnListView1Data(sender vcl.IObject, item *vcl.TListItem) {
 	f.sample_ds_lk.Lock()
 	defer f.sample_ds_lk.Unlock()
 	idx := item.Index()
-	if len(f.sample_ds.Data) < int(idx) {
+	if f.sample_ds == nil || len(f.sample_ds) < int(idx) {
 		return
 	}
-	d := f.sample_ds.Data[idx]
+	d := f.sample_ds[idx]
 	item.SetCaption(fmt.Sprintf("%d", idx+1))
 	sitem := item.SubItems()
 	sitem.Add(d.Update_time)
@@ -148,10 +156,10 @@ func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 			}
 			vcl.ThreadSync(func() {
 				f.sample_ds_lk.Lock()
-				f.sample_ds = tmpds
+				f.sample_ds = tmpds.Data
 				f.sample_ds_lk.Unlock()
 
-				f.ListView1.Items().SetCount(int32(len(f.sample_ds.Data)))
+				f.ListView1.Items().SetCount(int32(len(f.sample_ds)))
 			})
 			return nil
 		}()
@@ -551,59 +559,6 @@ func (f *TFormHome) Exportyijieshou(thread int, data []*nifdc.Data_o, fname stri
 	return nil
 }
 
-//导出已接收到sql
-func (f *TFormHome) Exportyijieshou_sql(thread int, data []*nifdc.Data_o, fname string) error {
-	if models.Ctx()==nil{
-		return errors.New("数据库未配置")
-	}
-	th := threadpool.NewThreadPool(thread, len(data))
-	for _, d := range data {
-		_d := d
-		th.Req(func() interface{} {
-			defer vcl.ThreadSync(func() {
-				f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
-			})
-			itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
-				tr, err := nifdc.Viewcheckedsample_full(_d.Sample_code, f.sample_ck, nil)
-				if err != nil {
-					return nil, err
-				}
-				return tr, nil
-			})
-			if err != nil {
-				fmt.Println(err)
-				return nil
-			}
-			tr := itr.(map[string]string)
-			cn:=0
-			err=models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?",tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
-			if err!=nil{
-				fmt.Println(err)
-				return nil
-			}
-			if cn!=0{
-				//已导入的跳过
-				return nil
-			}
-			err=models.Ctx().Create(&models.Jianyanxiangmu{
-				Id:      models.Build_id(),
-				V任务编号:   models.Build_taskid(),
-				V抽样委托单号: tr["抽样基础信息_抽样单编号"],
-			}).Error
-			if err!=nil{
-				fmt.Println(err)
-				return nil
-			}
-
-
-			return nil
-		})
-
-	}
-	th.Wait()
-	return nil
-}
-
 //导出抽样完成全部
 func (f *TFormHome) Exportchouyangwancheng_full(thread int, data []*nifdc.Data_o, fname string) error {
 	xlsxsheet := "Sheet1"
@@ -898,14 +853,9 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 
 	sel := int(f.Cbbt1s2.ItemIndex())  //任务状态
 	ssel := int(f.Cbbt1s3.ItemIndex()) //导出模式
-	if sel==1&&ssel==1{
-		//sql模式不弹窗
-	}else{
-		if f.SaveDialog1.Execute() == false {
-			return
-		}
+	if f.SaveDialog1.Execute() == false {
+		return
 	}
-
 	fname := f.SaveDialog1.FileName()
 
 	f.sample_ds_lk.Lock()
@@ -921,41 +871,36 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 			if w == false {
 				return nil
 			}
-			if tmpds == nil || len(tmpds.Data) == 0 {
+			if tmpds == nil || len(tmpds) == 0 {
 				return errors.New("数据不能为空")
 			}
 			vcl.ThreadSync(func() {
 				f.Gauge1.SetProgress(0)
-				f.Gauge1.SetMaxValue(int32(len(tmpds.Data)))
+				f.Gauge1.SetMaxValue(int32(len(tmpds)))
 			})
 			if sel == 0 { //导出抽样完成
 				if ssel == 0 { //导出全部字段
-					err := f.Exportchouyangwancheng_full(thread, tmpds.Data, fname)
+					err := f.Exportchouyangwancheng_full(thread, tmpds, fname)
 					if err != nil {
 						return err
 					}
 				} else { //导出半字段
-					err := f.Exportchouyangwancheng_half(thread, tmpds.Data, fname)
+					err := f.Exportchouyangwancheng_half(thread, tmpds, fname)
 					if err != nil {
 						return err
 					}
 				}
 			}
 			if sel == 1 { //导出已接收
-				if ssel==0{ //导出已接收全部到excel
-					err := f.Exportyijieshou(thread, tmpds.Data, fname)
-					if err != nil {
-						return err
-					}
-				}else if ssel==1{
-					err := f.Exportyijieshou_sql(thread,tmpds.Data,fname)
+				if ssel == 0 { //导出已接收全部到excel
+					err := f.Exportyijieshou(thread, tmpds, fname)
 					if err != nil {
 						return err
 					}
 				}
 			}
 			if sel == 2 { //导出检验完成
-				err := f.Exportjianyanwancheng_full(thread, tmpds.Data, fname)
+				err := f.Exportjianyanwancheng_full(thread, tmpds, fname)
 				if err != nil {
 					return err
 				}
@@ -984,6 +929,7 @@ func (f *TFormHome) OnListView1Resize(sender vcl.IObject) {
 func (f *TFormHome) OnTimer1Timer(sender vcl.IObject) {
 	f.ListView1.Invalidate()
 	f.ListView2.Invalidate()
+	f.ListView3.Invalidate()
 }
 func (f *TFormHome) GetUploadData(k string) *nifdc.UploadData {
 	f.uploaddatas_lk.Lock()
@@ -1092,7 +1038,7 @@ func (f *TFormHome) OnListView2Data(sender vcl.IObject, item *vcl.TListItem) {
 	f.uploaddatas_lk.Lock()
 	defer f.uploaddatas_lk.Unlock()
 	idx := item.Index()
-	if len(f.uploaddatas) < int(idx) {
+	if f.uploaddatas == nil || len(f.uploaddatas) < int(idx) {
 		return
 	}
 	d := f.uploaddatas[idx]
@@ -1123,6 +1069,8 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 	if f.Cbbt2s1.ItemIndex() == 1 {
 		tp = 1
 	}
+	sd := f.Dtpt2s1.Date().Format("2006-01-02")
+	ed := f.Dtpt2s2.Date().Format("2006-01-02")
 	taskfrom := url.QueryEscape(f.Edtt2s1.Text())
 	f.Buttont2s2.SetEnabled(false)
 	go func() {
@@ -1133,18 +1081,16 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 			if r == false {
 				return nil
 			}
-			enddate := time.Now()
-			startdate := enddate.AddDate(-1, 0, 0)
 			var dds *nifdc.Api_food_getFood_r
 			var err error
 			if tp == 0 {
-				dds, err = nifdc.Test_platform_api_food_getFood(taskfrom, startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_food_getFood(taskfrom, 1, sd, ed, 0, 10000, "sp_d_46", "desc", f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
 			}
 			if tp == 1 {
-				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, startdate.Format("2006-01-02"), enddate.Format("2006-01-02"), f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, sd, ed, f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
@@ -1297,7 +1243,6 @@ func (f *TFormHome) OnListView2DblClick(sender vcl.IObject) {
 	Formjiance.Td = td
 	Formjiance.ShowModal()
 }
-
 func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
 	f.Cbbt1s3.Clear()
 	if f.Cbbt1s2.Text() == "抽样完成" {
@@ -1305,9 +1250,255 @@ func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
 		f.Cbbt1s3.Items().Add("导出excel模式1")
 	} else if f.Cbbt1s2.Text() == "已接收" {
 		f.Cbbt1s3.Items().Add("导出excel")
-		f.Cbbt1s3.Items().Add("导出sql")
 	} else if f.Cbbt1s2.Text() == "检验完成" {
 		f.Cbbt1s3.Items().Add("导出excel")
 	}
 	f.Cbbt1s3.SetItemIndex(0)
+}
+func timeSub(t1, t2 time.Time) int {
+	t1 = time.Date(t1.Year(), t1.Month(), t1.Day(), 0, 0, 0, 0, time.Local)
+	t2 = time.Date(t2.Year(), t2.Month(), t2.Day(), 0, 0, 0, 0, time.Local)
+	return int(t1.Sub(t2).Hours() / 24)
+}
+func (f *TFormHome) getworkday(tm time.Time) string {
+	d := timeSub(time.Now(), tm)
+	nd := 0
+	for i := 0; i < d; i++ {
+		b, err := holidays.IsWorkingday(tm.AddDate(0, 0, (i + 1)))
+		if err != nil {
+			return "-"
+		}
+		if b == true {
+			nd++
+		}
+	}
+	if nd > 25 {
+		return "-"
+	}
+	return fmt.Sprintf("%d", nd)
+}
+func (f *TFormHome) OnListView3Data(sender vcl.IObject, item *vcl.TListItem) {
+	f.getFood_ds_lk.Lock()
+	defer f.getFood_ds_lk.Unlock()
+	idx := item.Index()
+	if f.getFood_ds == nil || len(f.getFood_ds) < int(idx) {
+		return
+	}
+	d := f.getFood_ds[idx]
+	item.SetCaption(fmt.Sprintf("%d", idx+1))
+	sitem := item.SubItems()
+	sitem.Add(time.Unix(d.Sp_d_38/1000, 0).Format("2006-01-02"))
+	sitem.Add(time.Unix(d.Sp_d_46/1000, 0).Format("2006-01-02"))
+	sitem.Add(f.getworkday(time.Unix(d.Sp_d_46/1000, 0)))
+	sitem.Add(d.Sp_s_16)
+	sitem.Add(time.Unix(d.Updated_at/1000, 0).Format("2006-01-02 15:04:05"))
+	sitem.Add(d.Sp_s_3)
+	sitem.Add(d.Sp_s_14)
+	sitem.Add(d.Sp_s_2_1)
+	sitem.Add(d.Sp_s_44)
+	sitem.Add(d.Sp_s_43)
+	sitem.Add(d.Sp_s_35)
+	sitem.Add(d.Sp_s_71)
+	sitem.Add(d.User.SEV("上传状态"))
+	sitem.Add(d.User.SEV("上传结果"))
+}
+func (f *TFormHome) OnListView3Resize(sender vcl.IObject) {
+	go vcl.ThreadSync(func() {
+		lastitem := f.ListView3.Column(f.ListView3.Columns().Count() - 1)
+		lastitem.SetWidth(lastitem.Width() - 10)
+	})
+}
+func (f *TFormHome) OnButtonp3s1Click(sender vcl.IObject) {
+	tp := 0
+	if f.Cbbt3s1.ItemIndex() == 0 {
+		tp = 0
+	}
+	if f.Cbbt3s1.ItemIndex() == 1 {
+		tp = 1
+	}
+
+	tasktype := int(f.Cbbt3s2.ItemIndex())
+	order := "desc"
+	if f.Cbbt3s4.ItemIndex() == 0 {
+		order = "desc"
+	} else {
+		order = "asc"
+	}
+	sort := ""
+	switch f.Cbbt3s3.ItemIndex() {
+	case 1:
+		sort = "sp_d_38"
+	case 2:
+		sort = "sp_s_16"
+	case 3:
+		sort = "updated_at"
+	case 4:
+		sort = "sp_s_71"
+	}
+	sd := f.Dtpt3s1.Date().Format("2006-01-02")
+	ed := f.Dtpt3s2.Date().Format("2006-01-02")
+	taskfrom := url.QueryEscape(f.Edtt3s1.Text())
+	f.Buttonp3s1.SetEnabled(false)
+	go func() {
+		defer vcl.ThreadSync(func() {
+			f.Buttonp3s1.SetEnabled(true)
+		})
+		err := func() error {
+			if r == false {
+				return nil
+			}
+
+			var tmpds *nifdc.Api_food_getFood_r
+			var err error
+			if tp == 0 {
+				tmpds, err = nifdc.Test_platform_api_food_getFood(taskfrom, tasktype, sd, ed, 0, 20000, sort, order, f.test_platform_ck, nil)
+				if err != nil {
+					return err
+				}
+			}
+			if tp == 1 {
+				tmpds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, sd, ed, f.test_platform_ck, nil)
+				if err != nil {
+					return err
+				}
+			}
+
+			vcl.ThreadSync(func() {
+				f.getFood_ds_lk.Lock()
+				f.getFood_ds = tmpds.Rows
+				f.getFood_ds_lk.Unlock()
+
+				f.ListView3.Items().SetCount(int32(len(f.getFood_ds)))
+			})
+			return nil
+		}()
+		if err != nil {
+			vcl.ThreadSyncVcl(func() {
+				vcl.ShowMessage(err.Error())
+			})
+			return
+		}
+	}()
+}
+
+func (f *TFormHome) OnTss3Show(sender vcl.IObject) {
+	err := func() error {
+		var err error
+		if f.test_platform_init == true {
+			return nil
+		}
+		f.test_platform_ck, err = nifdc.Test_platform_login(ck, nil)
+		if err != nil {
+			return err
+		}
+		f.test_platform_init = true
+		return nil
+	}()
+	if err != nil {
+		vcl.ShowMessage(err.Error())
+	}
+}
+
+//导出已接收到sql
+func (f *TFormHome) Exportyijieshou_sql(thread int, data []*nifdc.Api_food_getFood_o) error {
+	if models.Ctx() == nil {
+		return errors.New("数据库未配置")
+	}
+	for _, d := range data {
+		d.User.SSEV("上传状态", "")
+		d.User.SSEV("上传结果", "")
+	}
+	nerr := int32(0)
+	nok := int32(0)
+	nrey := int32(0)
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge3.SetProgress(f.Gauge3.Progress() + 1)
+				_d.User.SSEV("上传状态", "完成")
+			})
+			err := func() error {
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Test_platform_foodTest_foodDetail(_d.Id, f.test_platform_ck, nil)
+					if err != nil {
+						return nil, err
+					}
+					return tr, nil
+				})
+				if err != nil {
+					return err
+				}
+				tr := itr.(map[string]string)
+				cn := 0
+				err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?", tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
+				if err != nil {
+					return err
+				}
+				//if cn!=0{
+				//	//已导入的跳过
+				//	atomic.AddInt32(&nrey,1)
+				//	return nil
+				//}
+				err = models.Ctx().Create(&models.Jianyanxiangmu{
+					Id:      models.Build_id(),
+					V任务编号:   models.Build_taskid(),
+					V抽样委托单号: tr["抽样基础信息_抽样单编号"],
+				}).Error
+				if err != nil {
+					return err
+				}
+				atomic.AddInt32(&nok, 1)
+				return nil
+			}()
+			if err != nil {
+				atomic.AddInt32(&nerr, 1)
+				_d.User.SSEV("上传结果", err.Error())
+				return err
+			}
+			_d.User.SSEV("上传结果", "完成")
+			return nil
+		})
+
+	}
+	th.Wait()
+	vcl.ThreadSync(func() {
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n已存在:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
+	})
+	return nil
+}
+func (f *TFormHome) OnButtonp3s2Click(sender vcl.IObject) {
+	f.getFood_ds_lk.Lock()
+	tmpds := f.getFood_ds
+	f.getFood_ds_lk.Unlock()
+	f.Buttonp3s2.SetEnabled(false)
+	go func() {
+		defer vcl.ThreadSync(func() {
+			f.Buttonp3s2.SetEnabled(true)
+		})
+		err := func() error {
+			if w == false {
+				return nil
+			}
+			if tmpds == nil || len(tmpds) == 0 {
+				return errors.New("数据不能为空")
+			}
+			vcl.ThreadSync(func() {
+				f.Gauge3.SetProgress(0)
+				f.Gauge3.SetMaxValue(int32(len(tmpds)))
+			})
+			err := f.Exportyijieshou_sql(thread, tmpds)
+			if err != nil {
+				return err
+			}
+			return nil
+		}()
+		if err != nil {
+			vcl.ThreadSyncVcl(func() {
+				vcl.ShowMessage(err.Error())
+			})
+			return
+		}
+	}()
 }
