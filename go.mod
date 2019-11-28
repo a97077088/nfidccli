@@ -9,6 +9,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1-0.20191015220908-b17a2bbb6dc1 // indirect
 	github.com/a97077088/addrmgr v0.0.0-20190927080110-5c049e003dac
 	github.com/a97077088/appuser v0.0.0-20190927081129-fb44efe834a1
+	github.com/a97077088/chinese-holidays-go v0.0.0-20191128133315-349871c1ecb0
 	github.com/a97077088/nettool v0.0.0-20190927091157-ec40b0993cc2
 	github.com/a97077088/nifdc v0.0.0-20191019115534-5cd00a9a9ab5
 	github.com/a97077088/threadpool v0.0.0-20190925091556-2981d99ff157
