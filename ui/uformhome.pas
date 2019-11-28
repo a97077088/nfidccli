@@ -68,6 +68,8 @@ type
     Label15: TLabel;
     Cbbt3s4: TComboBox;
     Label16: TLabel;
+    Buttonp3s3: TButton;
+    Buttonp3s4: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Tss1Show(Sender: TObject);
@@ -90,6 +92,8 @@ type
     procedure Buttonp3s1Click(Sender: TObject);
     procedure Tss3Show(Sender: TObject);
     procedure Buttonp3s2Click(Sender: TObject);
+    procedure Buttonp3s3Click(Sender: TObject);
+    procedure Buttonp3s4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -119,6 +123,16 @@ begin
 end;
 
 procedure TFormHome.Buttonp3s2Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp3s3Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp3s4Click(Sender: TObject);
 begin
 //
 end;

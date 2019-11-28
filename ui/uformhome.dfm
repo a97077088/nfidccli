@@ -26,11 +26,9 @@ object FormHome: TFormHome
     Width = 1332
     Height = 669
     Margins.Top = 10
-    ActivePage = Tss3
+    ActivePage = Tss1
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = -2
-    ExplicitTop = 5
     object Tss1: TTabSheet
       Caption = #19979#36733#26679#21697#20449#24687
       OnShow = Tss1Show
@@ -601,7 +599,7 @@ object FormHome: TFormHome
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
-          Caption = #23548#20986
+          Caption = #23548#20986'sql'
           TabOrder = 4
           OnClick = Buttonp3s2Click
         end
@@ -674,6 +672,26 @@ object FormHome: TFormHome
           Items.Strings = (
             #22823#22312#21069
             #23567#22312#21069)
+        end
+        object Buttonp3s3: TButton
+          Left = 1107
+          Top = 48
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #21024#38500
+          TabOrder = 9
+          OnClick = Buttonp3s3Click
+        end
+        object Buttonp3s4: TButton
+          Left = 1223
+          Top = 48
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #23548#20986'excel'
+          TabOrder = 10
+          OnClick = Buttonp3s4Click
         end
       end
       object ListView3: TListView
@@ -750,12 +768,12 @@ object FormHome: TFormHome
           item
             Alignment = taCenter
             AutoSize = True
-            Caption = #23548#20986#29366#24577
+            Caption = #22788#29702#29366#24577
           end
           item
             Alignment = taCenter
             AutoSize = True
-            Caption = #23548#20986#32467#26524
+            Caption = #22788#29702#32467#26524
           end>
         DoubleBuffered = True
         Font.Charset = ANSI_CHARSET
@@ -772,7 +790,6 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView3Data
         OnResize = ListView3Resize
-        ExplicitHeight = 535
       end
     end
     object Tss4: TTabSheet

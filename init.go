@@ -11,7 +11,9 @@ var ck = "JSESSIONID=B982784226324A539BF7C49B16D08CE7-n1; Path=/; HttpOnly;SSOWa
 var user = ""
 var addr = "122.51.93.214:14662"
 var w, r bool
-var debug=true
+
+//打开调试模式
+var debug = false
 
 var nfidcproc proc.NifdcrpcClient
 
