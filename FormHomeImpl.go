@@ -1364,6 +1364,7 @@ func (f *TFormHome) OnButtonp3s1Click(sender vcl.IObject) {
 		sort = "sp_s_71"
 	}
 	sd := f.Dtpt3s1.Date().Format("2006-01-02")
+	tmsd := f.Dtpt3s1.Date()
 	ed := f.Dtpt3s2.Date().Format("2006-01-02")
 	taskfrom := url.QueryEscape(f.Edtt3s1.Text())
 	f.Buttonp3s1.SetEnabled(false)
@@ -1390,10 +1391,16 @@ func (f *TFormHome) OnButtonp3s1Click(sender vcl.IObject) {
 					return err
 				}
 			}
+			tmpds1 := make([]*nifdc.Api_food_getFood_o, 0)
+			for _, it := range tmpds.Rows {
+				if it.Created_at/1000 >= tmsd.Unix() {
+					tmpds1 = append(tmpds1, it)
+				}
+			}
 
 			vcl.ThreadSync(func() {
 				f.getFood_ds_lk.Lock()
-				f.getFood_ds = tmpds.Rows
+				f.getFood_ds = tmpds1
 				f.getFood_ds_lk.Unlock()
 
 				f.ListView3.Items().SetCount(int32(len(f.getFood_ds)))
