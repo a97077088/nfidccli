@@ -1557,7 +1557,7 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_
 				}
 				tr := itr.(map[string]string)
 				cn := 0
-				err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样委托单号=?", tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
+				err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("抽样单号=?", tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
 				if err != nil {
 					return err
 				}
@@ -1569,7 +1569,7 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_
 				fds := []string{
 					"id",
 					"任务编号",
-					"抽样委托单号",
+					"抽样单号",
 				}
 				vds := []string{
 					fmt.Sprintf("'%s'", models.Build_id()),
