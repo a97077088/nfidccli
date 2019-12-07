@@ -26,7 +26,7 @@ object FormHome: TFormHome
     Width = 1389
     Height = 669
     Margins.Top = 10
-    ActivePage = Tss3
+    ActivePage = Tss1
     Align = alClient
     TabOrder = 0
     object Tss1: TTabSheet
@@ -257,6 +257,10 @@ object FormHome: TFormHome
       ImageIndex = 1
       TabVisible = False
       OnShow = Tss2Show
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Gauge2: TGauge
         Left = 0
         Top = 589
@@ -820,15 +824,17 @@ object FormHome: TFormHome
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 1381
-        Height = 630
+        Width = 90
+        Height = 24
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
-        ExplicitWidth = 90
-        ExplicitHeight = 24
       end
     end
   end

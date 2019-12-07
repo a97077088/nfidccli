@@ -81,7 +81,7 @@ func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	f.Cbbt1s3.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt3s1.SetItemIndex(0)
-	f.Cbbt3s2.SetItemIndex(5)
+	f.Cbbt3s2.SetItemIndex(0)
 	f.Cbbt3s3.SetItemIndex(0)
 	f.Cbbt3s4.SetItemIndex(0)
 	f.Dtpt1s1.SetDate(time.Now().AddDate(0, -1, 0))
@@ -90,7 +90,7 @@ func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	f.Dtpt2s1.SetDate(time.Now().AddDate(0, -1, 0))
 	f.Dtpt2s2.SetDate(time.Now())
 
-	//f.Dtpt3s1.SetDate(time.Now().AddDate(0, -1, 0))
+	f.Dtpt3s1.SetDate(time.Now().AddDate(0, -1, 0))
 	f.Dtpt3s2.SetDate(time.Now())
 }
 func (f *TFormHome) OnTss1Show(sender vcl.IObject) {
@@ -1937,7 +1937,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 						return err
 					}
 					if rn == 0 { //插入
-						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据) values (?,?,?,?,?,?,?,?,?,?)",
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,备注,检验室,检验员,进度,返工) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 							strconv.Itoa(subidx),
 							renwu.V任务编号,
 							strconv.Itoa(subidx),
@@ -1948,12 +1948,36 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							subr["检验结果*"],
 							subr["结果判定*"],
 							subr["判定依据*"],
+							subr["最小允许限*"],
+							subr["最大允许限*"],
+							subr["方法检出限*"],
+							subr["备注"],
+							"GC",
+							"检验员",
+							"20",
+							"0",
 						).Error
 						if err != nil {
 							return err
 						}
 					} else { //添加
-
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,备注=? where 任务编号=? and 项目名称=?",
+							subr["检验项目*"],
+							subr["结果单位*"],
+							subr["检验依据*"],
+							subr["检验结果*"],
+							subr["结果判定*"],
+							subr["判定依据*"],
+							subr["最小允许限*"],
+							subr["最大允许限*"],
+							subr["方法检出限*"],
+							subr["备注"],
+							renwu.V任务编号,
+							subr["检验项目*"],
+						).Error
+						if err != nil {
+							return err
+						}
 					}
 				}
 				atomic.AddInt32(&nok, 1)
@@ -1995,11 +2019,6 @@ func (f *TFormHome) OnButtonp3s5Click(sender vcl.IObject) {
 			if w == false {
 				return nil
 			}
-			var err error
-			f.jianyanjieguosql_rule, err = f.readrule("./下载检验结果sql规则.txt")
-			if err != nil {
-				return err
-			}
 
 			if tmpds == nil || len(tmpds) == 0 {
 				return errors.New("数据不能为空")
@@ -2008,7 +2027,7 @@ func (f *TFormHome) OnButtonp3s5Click(sender vcl.IObject) {
 				f.Gauge3.SetProgress(0)
 				f.Gauge3.SetMaxValue(int32(len(tmpds)))
 			})
-			err = f.Exportxiazaijianyanxiangmu_sql(thread, tmpds, tp)
+			err := f.Exportxiazaijianyanxiangmu_sql(thread, tmpds, tp)
 			if err != nil {
 				return err
 			}
@@ -2023,6 +2042,152 @@ func (f *TFormHome) OnButtonp3s5Click(sender vcl.IObject) {
 	}()
 }
 
+//下载检验项目导出到web
+func (f *TFormHome) Exportxiazaijianyanxiangmu_web(thread int, data []*nifdc.Api_food_getFood_o, tp int) error {
+	if models.Ctx() == nil {
+		return errors.New("数据库未配置")
+	}
+	for _, d := range data {
+		d.User.SSEV("处理状态", "")
+		d.User.SSEV("处理结果", "")
+	}
+	nerr := int32(0)
+	nok := int32(0)
+	nrey := int32(0)
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge3.SetProgress(f.Gauge3.Progress() + 1)
+				_d.User.SSEV("处理状态", "完成")
+			})
+			err := func() error {
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					if tp == 0 { //普通食品
+						tr, err := nifdc.Test_platform_foodTest_foodDetail(_d.Id, f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						return tr, nil
+					} else if tp == 1 { //农产品
+						tr, err := nifdc.Test_platform_agricultureTest_agricultureDetail(_d.Id, f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						return tr, nil
+					}
+					return nil, errors.New("不支持的模式")
+				})
+				if err != nil {
+					return err
+				}
+				tr := itr.(map[string]string)
+				itsubtr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, err error) {
+					r, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
+					if err != nil {
+						return nil, err
+					}
+					return nifdc.TestInfotoMap(r.Rows), nil
+				})
+				if err != nil {
+					return err
+				}
+				subtr := itsubtr.([]map[string]string)
+				renwu := &models.Jianyanrenwu{}
+				err = models.Ctx().Model(&models.Jianyanrenwu{}).Where("抽样单号=?", tr["抽样基础信息_抽样单编号"]).Find(&renwu).Error
+				if err != nil {
+					return err
+				}
+
+				for idx, subr := range subtr {
+					subidx := idx + 1
+					rn := 0
+					err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("任务编号=? and 项目名称=?", renwu.V任务编号, subr["检验项目*"]).Count(&rn).Error
+					if err != nil {
+						return err
+					}
+					if rn == 0 { //插入
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据) values (?,?,?,?,?,?,?,?,?,?)",
+							strconv.Itoa(subidx),
+							renwu.V任务编号,
+							strconv.Itoa(subidx),
+							subr["检验项目*"],
+							tr["抽检样品信息_样品名称"],
+							subr["结果单位*"],
+							subr["检验依据*"],
+							subr["检验结果*"],
+							subr["结果判定*"],
+							subr["判定依据*"],
+						).Error
+						if err != nil {
+							return err
+						}
+					} else { //添加
+
+					}
+				}
+				atomic.AddInt32(&nok, 1)
+				return nil
+			}()
+			if err != nil {
+				atomic.AddInt32(&nerr, 1)
+				_d.User.SSEV("处理结果", err.Error())
+				return err
+			}
+			_d.User.SSEV("处理结果", "完成")
+			return nil
+		})
+
+	}
+	th.Wait()
+	vcl.ThreadSync(func() {
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n已存在:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
+	})
+	return nil
+}
 func (f *TFormHome) OnButtonp3s6Click(sender vcl.IObject) {
 
+	vcl.ShowMessage("功能开发中")
+	return
+	tp := 0
+	if f.Cbbt3s1.ItemIndex() == 0 {
+		tp = 0
+	}
+	if f.Cbbt3s1.ItemIndex() == 1 {
+		tp = 1
+	}
+	f.getFood_ds_lk.Lock()
+	tmpds := f.getFood_ds
+	f.getFood_ds_lk.Unlock()
+	f.Buttonp3s6.SetEnabled(false)
+	go func() {
+		defer vcl.ThreadSync(func() {
+			f.Buttonp3s6.SetEnabled(true)
+		})
+		err := func() error {
+			if w == false {
+				return nil
+			}
+
+			if tmpds == nil || len(tmpds) == 0 {
+				return errors.New("数据不能为空")
+			}
+			vcl.ThreadSync(func() {
+				f.Gauge3.SetProgress(0)
+				f.Gauge3.SetMaxValue(int32(len(tmpds)))
+			})
+			err := f.Exportxiazaijianyanxiangmu_web(thread, tmpds, tp)
+			if err != nil {
+				return err
+			}
+			return nil
+		}()
+		if err != nil {
+			vcl.ThreadSyncVcl(func() {
+				vcl.ShowMessage(err.Error())
+			})
+			return
+		}
+	}()
 }
