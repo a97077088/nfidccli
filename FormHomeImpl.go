@@ -32,6 +32,7 @@ import (
 type TFormHomeFields struct {
 	sample_uuid  string
 	sample_type  string
+
 	sample_chs   []*nifdc.Channel
 	sample_ds    []*nifdc.Data_o
 	sample_ds_lk sync.Mutex
@@ -49,6 +50,7 @@ type TFormHomeFields struct {
 
 	jianyanjieguosql_rule   [][]string
 	jianyanjieguoexcel_rule [][]string
+	renwudapingtaiexcel_rule [][]string
 }
 
 func (f *TFormHome) readrule(rulename string) ([][]string, error) {
@@ -80,7 +82,6 @@ func (f *TFormHome) OnFormClose(sender vcl.IObject, action *types.TCloseAction) 
 func (f *TFormHome) OnFormCreate(sender vcl.IObject) {
 	FormHome.SetShowInTaskBar(types.StAlways)
 	f.Cbbt1s2.SetItemIndex(0)
-	f.Cbbt1s3.SetItemIndex(0)
 	f.Cbbt2s1.SetItemIndex(0)
 	f.Cbbt3s1.SetItemIndex(0)
 	f.Cbbt3s2.SetItemIndex(0)
@@ -139,18 +140,25 @@ func (f *TFormHome) OnListView1Data(sender vcl.IObject, item *vcl.TListItem) {
 	sitem.Add(d.Sp_d_38)
 	sitem.Add(d.Resource_org_name)
 	sitem.Add(d.Check_user_name)
+	sitem.Add(d.User.SEV("处理状态"))
+	sitem.Add(d.User.SEV("处理结果"))
 }
 func (f *TFormHome) OnButtonp1s1Click(sender vcl.IObject) {
 	state := 0
 	if f.Cbbt1s2.ItemIndex() == 0 {
+		state = 3
+	} else if f.Cbbt1s2.ItemIndex() == 1 {
 		state = 4
-	}
-	if f.Cbbt1s2.ItemIndex() == 1 {
+	} else if f.Cbbt1s2.ItemIndex() == 2 {
 		state = 5
-	}
-	if f.Cbbt1s2.ItemIndex() == 2 {
+	} else if f.Cbbt1s2.ItemIndex() == 3 {
+		state = 6
+	}else if f.Cbbt1s2.ItemIndex() == 4 {
+		state = 7
+	}else if f.Cbbt1s2.ItemIndex() == 5 {
 		state = 12
 	}
+
 	resource_org_id := f.Edtt1s1.Text()
 	f.Buttonp1s1.SetEnabled(false)
 	go func() {
@@ -878,19 +886,113 @@ func (f *TFormHome) Exportchouyangwancheng_half(thread int, data []*nifdc.Data_o
 	}
 	return nil
 }
-func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 
-	sel := int(f.Cbbt1s2.ItemIndex())  //任务状态
-	ssel := int(f.Cbbt1s3.ItemIndex()) //导出模式
+
+
+//导出任务大平台excel
+func (f *TFormHome) Exportrenwudapingtai_excel(thread int, data []*nifdc.Data_o, fname string) error {
+	for _, d := range data {
+		d.User.SSEV("处理状态", "")
+		d.User.SSEV("处理结果", "")
+	}
+	nerr := int32(0)
+	nok := int32(0)
+	nrey := int32(0)
+	xlsxf := xlsx.NewFile()
+	sheet, err := xlsxf.AddSheet("数据报告")
+	if err != nil {
+		return err
+	}
+	sheet_lk := sync.Mutex{}
+	row := sheet.AddRow()
+	for _, it := range f.renwudapingtaiexcel_rule {
+		dbk := it[0]
+		cell := row.AddCell()
+		cell.SetString(dbk)
+	}
+	sheet.SetColWidth(0, len(f.renwudapingtaiexcel_rule), 15)
+
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(f.Gauge1.Progress() + 1)
+				_d.User.SSEV("处理状态", "完成")
+			})
+			err := func() error {
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Viewcheckedsample_full(_d.Sample_code, f.sample_ck, nil)
+					if err != nil {
+						return nil, err
+					}
+					return tr, nil
+				})
+				if err != nil {
+					return err
+				}
+				tr := itr.(map[string]string)
+				fmt.Println(tr)
+
+				sheet_lk.Lock()
+				row := sheet.AddRow()
+				tmj := template.New("tmj")
+				tmj.Funcs(map[string]interface{}{
+					"replace": strings.ReplaceAll,
+				})
+				for _, it := range f.renwudapingtaiexcel_rule {
+					webk := it[1]
+
+					_, err = tmj.Parse(webk)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+					var tmpwebv bytes.Buffer
+					err := tmj.Execute(&tmpwebv, tr)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+
+					cl := row.AddCell()
+					cl.SetString(tmpwebv.String())
+				}
+				sheet_lk.Unlock()
+
+				atomic.AddInt32(&nok, 1)
+				return nil
+			}()
+			if err != nil {
+				atomic.AddInt32(&nerr, 1)
+				_d.User.SSEV("处理结果", err.Error())
+				return err
+			}
+			_d.User.SSEV("处理结果", "完成")
+			return nil
+		})
+
+	}
+	th.Wait()
+	err = xlsxf.Save(fname)
+	if err != nil {
+		return err
+	}
+	vcl.ThreadSync(func() {
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n已存在:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
+	})
+
+
+	return nil
+}
+func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 	if f.SaveDialog1.Execute() == false {
 		return
 	}
 	fname := f.SaveDialog1.FileName()
-
 	f.sample_ds_lk.Lock()
 	tmpds := f.sample_ds
 	f.sample_ds_lk.Unlock()
-
 	f.Buttonp1s2.SetEnabled(false)
 	go func() {
 		defer vcl.ThreadSync(func() {
@@ -903,42 +1005,25 @@ func (f *TFormHome) OnButtonp1s2Click(sender vcl.IObject) {
 			if tmpds == nil || len(tmpds) == 0 {
 				return errors.New("数据不能为空")
 			}
+
+			var err error
+			f.renwudapingtaiexcel_rule, err = f.readrule("./下载任务大平台excel规则.txt")
+			if err != nil {
+				return err
+			}
+
 			vcl.ThreadSync(func() {
 				f.Gauge1.SetProgress(0)
 				f.Gauge1.SetMaxValue(int32(len(tmpds)))
 			})
-			if sel == 0 { //导出抽样完成
-				if ssel == 0 { //导出全部字段
-					err := f.Exportchouyangwancheng_full(thread, tmpds, fname)
-					if err != nil {
-						return err
-					}
-				} else { //导出半字段
-					err := f.Exportchouyangwancheng_half(thread, tmpds, fname)
-					if err != nil {
-						return err
-					}
-				}
-			}
-			if sel == 1 { //导出已接收
-				if ssel == 0 { //导出已接收全部到excel
-					err := f.Exportyijieshou(thread, tmpds, fname)
-					if err != nil {
-						return err
-					}
-				}
-			}
-			if sel == 2 { //导出检验完成
-				err := f.Exportjianyanwancheng_full(thread, tmpds, fname)
-				if err != nil {
-					return err
-				}
+			err=f.Exportrenwudapingtai_excel(thread,tmpds,fname)
+			if err != nil {
+				return err
 			}
 
 			vcl.ThreadSync(func() {
 				vcl.ShowMessage(fmt.Sprintf("%s 已保存", fname))
 			})
-
 			return nil
 		}()
 		if err != nil {
@@ -1273,16 +1358,7 @@ func (f *TFormHome) OnListView2DblClick(sender vcl.IObject) {
 	Formjiance.ShowModal()
 }
 func (f *TFormHome) OnCbbt1s2Change(sender vcl.IObject) {
-	f.Cbbt1s3.Clear()
-	if f.Cbbt1s2.Text() == "抽样完成" {
-		f.Cbbt1s3.Items().Add("导出excel")
-		f.Cbbt1s3.Items().Add("导出excel模式1")
-	} else if f.Cbbt1s2.Text() == "已接收" {
-		f.Cbbt1s3.Items().Add("导出excel")
-	} else if f.Cbbt1s2.Text() == "检验完成" {
-		f.Cbbt1s3.Items().Add("导出excel")
-	}
-	f.Cbbt1s3.SetItemIndex(0)
+
 }
 func timeSub(t1, t2 time.Time) int {
 	t1 = time.Date(t1.Year(), t1.Month(), t1.Day(), 0, 0, 0, 0, time.Local)
@@ -1418,7 +1494,6 @@ func (f *TFormHome) OnButtonp3s1Click(sender vcl.IObject) {
 		}
 	}()
 }
-
 func (f *TFormHome) OnTss3Show(sender vcl.IObject) {
 	err := func() error {
 		var err error
@@ -1436,7 +1511,6 @@ func (f *TFormHome) OnTss3Show(sender vcl.IObject) {
 		vcl.ShowMessage(err.Error())
 	}
 }
-
 func inArray(s string, arr []string) bool {
 	for _, it := range arr {
 		if it == s {
@@ -1517,7 +1591,6 @@ func (f *TFormHome) cv_jianyanrenwu_dbv(dbk string, v string) string {
 	}
 	return fmt.Sprintf("'%s'", v)
 }
-
 //下载检验任务导出到sql
 func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_food_getFood_o, tp int) error {
 	if models.Ctx() == nil {
@@ -1676,7 +1749,6 @@ func (f *TFormHome) OnButtonp3s2Click(sender vcl.IObject) {
 		}
 	}()
 }
-
 //删除检验结果导出到sql
 func (f *TFormHome) Deletexiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_food_getFood_o) error {
 	if models.Ctx() == nil {
@@ -1754,7 +1826,6 @@ func (f *TFormHome) OnButtonp3s3Click(sender vcl.IObject) {
 		}
 	}()
 }
-
 //下载检验结果导出到excel
 func (f *TFormHome) Exportxiazaijianyanjieguo_excel(thread int, data []*nifdc.Api_food_getFood_o, fname string, tp int) error {
 	for _, d := range data {

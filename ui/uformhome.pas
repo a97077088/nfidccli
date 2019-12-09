@@ -39,7 +39,6 @@ type
     ListView2: TListView;
     Gauge2: TGauge;
     DlgOpen1: TOpenDialog;
-    Cbbt1s3: TComboBox;
     Label2: TLabel;
     Edtt1s1: TEdit;
     Edtt2s1: TEdit;

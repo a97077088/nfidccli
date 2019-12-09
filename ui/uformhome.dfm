@@ -50,28 +50,25 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
+        ExplicitTop = -3
         DesignSize = (
           1381
           89)
         object Label3: TLabel
-          Left = 1095
+          Left = 415
+          Top = 10
+          Width = 76
+          Height = 24
+          Alignment = taRightJustify
+          Caption = #36873#25321#31995#32479':'
+        end
+        object Label4: TLabel
+          Left = 417
           Top = 57
           Width = 76
           Height = 24
           Alignment = taRightJustify
-          Anchors = [akTop, akRight]
-          Caption = #36873#25321#31995#32479':'
-          ExplicitLeft = 1038
-        end
-        object Label4: TLabel
-          Left = 820
-          Top = 11
-          Width = 76
-          Height = 24
-          Alignment = taRightJustify
-          Anchors = [akTop, akRight]
           Caption = #20219#21153#29366#24577':'
-          ExplicitLeft = 763
         end
         object Label5: TLabel
           Left = 14
@@ -97,11 +94,10 @@ object FormHome: TFormHome
           Caption = #20219#21153#26469#28304':'
         end
         object Cbbt1s1: TComboBox
-          Left = 1177
-          Top = 54
+          Left = 497
+          Top = 7
           Width = 192
           Height = 32
-          Anchors = [akTop, akRight]
           DoubleBuffered = False
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -124,11 +120,10 @@ object FormHome: TFormHome
           TabOrder = 1
         end
         object Cbbt1s2: TComboBox
-          Left = 900
-          Top = 8
-          Width = 130
+          Left = 497
+          Top = 54
+          Width = 192
           Height = 32
-          Anchors = [akTop, akRight]
           DoubleBuffered = False
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
@@ -140,8 +135,11 @@ object FormHome: TFormHome
           TabOrder = 2
           OnChange = Cbbt1s2Change
           Items.Strings = (
+            #27491#22312#25277#26679
             #25277#26679#23436#25104
             #24050#25509#25910
+            #24050#25298#25910
+            #26080#27861#26816#39564
             #26816#39564#23436#25104)
         end
         object Dtpt1s2: TDateTimePicker
@@ -156,8 +154,8 @@ object FormHome: TFormHome
           TabOrder = 3
         end
         object Buttonp1s1: TButton
-          Left = 1044
-          Top = 4
+          Left = 1272
+          Top = 0
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -166,8 +164,8 @@ object FormHome: TFormHome
           OnClick = Buttonp1s1Click
         end
         object Buttonp1s2: TButton
-          Left = 1280
-          Top = 4
+          Left = 1272
+          Top = 42
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -175,23 +173,12 @@ object FormHome: TFormHome
           TabOrder = 5
           OnClick = Buttonp1s2Click
         end
-        object Cbbt1s3: TComboBox
-          Left = 1139
-          Top = 8
-          Width = 135
-          Height = 32
-          Anchors = [akTop, akRight]
-          TabOrder = 6
-          Items.Strings = (
-            #23548#20986'excel'
-            #23548#20986'excel'#27169#24335'1')
-        end
         object Edtt1s1: TEdit
           Left = 97
           Top = 54
           Width = 291
           Height = 32
-          TabOrder = 7
+          TabOrder = 6
         end
       end
       object ListView1: TListView
@@ -233,6 +220,16 @@ object FormHome: TFormHome
             Alignment = taCenter
             AutoSize = True
             Caption = #25277#26679#20154
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #22788#29702#29366#24577
+          end
+          item
+            Alignment = taCenter
+            AutoSize = True
+            Caption = #22788#29702#32467#26524
           end>
         DoubleBuffered = True
         Font.Charset = ANSI_CHARSET
@@ -820,17 +817,15 @@ object FormHome: TFormHome
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 90
-        Height = 24
+        Width = 1381
+        Height = 630
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
+        ExplicitWidth = 90
+        ExplicitHeight = 24
       end
     end
   end
