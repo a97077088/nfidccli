@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
@@ -23,6 +24,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"text/template"
 	"time"
 )
 
@@ -1516,7 +1518,7 @@ func (f *TFormHome) cv_jianyanrenwu_dbv(dbk string, v string) string {
 	return fmt.Sprintf("'%s'", v)
 }
 
-//下载检验结果导出到sql
+//下载检验任务导出到sql
 func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_food_getFood_o, tp int) error {
 	if models.Ctx() == nil {
 		return errors.New("数据库未配置")
@@ -1577,12 +1579,31 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_
 					fmt.Sprintf("'%s'", models.Build_taskid()),
 					fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),
 				}
+
+				tmj := template.New("tmj")
+				tmj.Funcs(map[string]interface{}{
+					"replace": strings.ReplaceAll,
+				})
 				for _, it := range f.jianyanjieguosql_rule {
 					dbk := it[0]
 					webk := it[1]
 					fds = append(fds, dbk)
 
-					webv := f.cv_jianyanrenwu_dbv(dbk, tr[webk])
+					_, err = tmj.Parse(webk)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+
+					var tmpwebv bytes.Buffer
+
+					err := tmj.Execute(&tmpwebv, tr)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+
+					webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
 					vds = append(vds, webv)
 				}
 				err = models.Ctx().Exec(fmt.Sprintf("insert into 检验任务 (%s) values (%s)", strings.Join(fds, ","), strings.Join(vds, ","))).Error
@@ -1789,10 +1810,27 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_excel(thread int, data []*nifdc.Ap
 
 				sheet_lk.Lock()
 				row := sheet.AddRow()
+				tmj := template.New("tmj")
+				tmj.Funcs(map[string]interface{}{
+					"replace": strings.ReplaceAll,
+				})
 				for _, it := range f.jianyanjieguoexcel_rule {
 					webk := it[1]
+
+					_, err = tmj.Parse(webk)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+					var tmpwebv bytes.Buffer
+					err := tmj.Execute(&tmpwebv, tr)
+					if err != nil {
+						fmt.Println(err)
+						return err
+					}
+
 					cl := row.AddCell()
-					cl.SetString(tr[webk])
+					cl.SetString(tmpwebv.String())
 				}
 				sheet_lk.Unlock()
 

@@ -257,10 +257,6 @@ object FormHome: TFormHome
       ImageIndex = 1
       TabVisible = False
       OnShow = Tss2Show
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Gauge2: TGauge
         Left = 0
         Top = 589
