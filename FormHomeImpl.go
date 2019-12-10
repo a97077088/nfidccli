@@ -2046,7 +2046,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 						return err
 					}
 					if rn == 0 { //插入
-						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,备注,检验室,检验员,进度,返工) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,标准值,备注,检验室,检验员,进度,返工) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 							strconv.Itoa(subidx),
 							renwu.V任务编号,
 							strconv.Itoa(subidx),
@@ -2060,6 +2060,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							subr["最小允许限*"],
 							subr["最大允许限*"],
 							subr["方法检出限*"],
+							subr["最大允许限*"],
 							subr["备注"],
 							"GC",
 							"检验员",
@@ -2070,7 +2071,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							return err
 						}
 					} else { //添加
-						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,备注=? where 任务编号=? and 项目名称=?",
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,标准值=?,备注=? where 任务编号=? and 项目名称=?",
 							subr["检验项目*"],
 							subr["结果单位*"],
 							subr["检验依据*"],
@@ -2080,6 +2081,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							subr["最小允许限*"],
 							subr["最大允许限*"],
 							subr["方法检出限*"],
+							subr["最大允许限*"],
 							subr["备注"],
 							renwu.V任务编号,
 							subr["检验项目*"],

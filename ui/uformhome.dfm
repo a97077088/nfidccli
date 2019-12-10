@@ -26,7 +26,7 @@ object FormHome: TFormHome
     Width = 1425
     Height = 669
     Margins.Top = 10
-    ActivePage = Tss1
+    ActivePage = Tss3
     Align = alClient
     TabOrder = 0
     object Tss1: TTabSheet
@@ -591,7 +591,6 @@ object FormHome: TFormHome
           Caption = #26597#35810
           TabOrder = 3
           OnClick = Buttonp3s1Click
-          ExplicitLeft = 1052
         end
         object Buttonp3s2: TButton
           Left = 1204
@@ -602,7 +601,6 @@ object FormHome: TFormHome
           Caption = #23548#20986'sql'
           TabOrder = 4
           OnClick = Buttonp3s2Click
-          ExplicitLeft = 1168
         end
         object Edtt3s1: TEdit
           Left = 97
@@ -683,7 +681,6 @@ object FormHome: TFormHome
           Caption = #21024#38500
           TabOrder = 9
           OnClick = Buttonp3s3Click
-          ExplicitLeft = 1052
         end
         object Buttonp3s4: TButton
           Left = 1204
@@ -694,10 +691,9 @@ object FormHome: TFormHome
           Caption = #23548#20986'excel'
           TabOrder = 10
           OnClick = Buttonp3s4Click
-          ExplicitLeft = 1168
         end
         object Buttonp3s5: TButton
-          Left = 1307
+          Left = 1299
           Top = 4
           Width = 98
           Height = 38
@@ -705,7 +701,6 @@ object FormHome: TFormHome
           Caption = #39033#30446#21040'sql'
           TabOrder = 11
           OnClick = Buttonp3s5Click
-          ExplicitLeft = 1271
         end
         object Buttonp3s6: TButton
           Left = 1307
@@ -716,7 +711,6 @@ object FormHome: TFormHome
           Caption = #39033#30446#21040#32593#31449
           TabOrder = 12
           OnClick = Buttonp3s6Click
-          ExplicitLeft = 1271
         end
       end
       object ListView3: TListView
@@ -815,24 +809,21 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView3Data
         OnResize = ListView3Resize
-        ExplicitWidth = 1375
       end
     end
     object Tss4: TTabSheet
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
       TabVisible = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 90
-        Height = 24
+        Width = 1417
+        Height = 630
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
+        ExplicitWidth = 90
+        ExplicitHeight = 24
       end
     end
   end
