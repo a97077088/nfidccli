@@ -29,11 +29,9 @@ object FormHome: TFormHome
     ActivePage = Tss1
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 1389
     object Tss1: TTabSheet
       Caption = #20219#21153#22823#24179#21488
       OnShow = Tss1Show
-      ExplicitWidth = 1381
       object Gauge1: TGauge
         Left = 0
         Top = 589
@@ -52,7 +50,6 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
-        ExplicitWidth = 1381
         DesignSize = (
           1417
           89)
@@ -164,7 +161,6 @@ object FormHome: TFormHome
           Caption = #26597#35810
           TabOrder = 4
           OnClick = Buttonp1s1Click
-          ExplicitLeft = 1272
         end
         object Buttonp1s2: TButton
           Left = 1308
@@ -175,7 +171,6 @@ object FormHome: TFormHome
           Caption = #23548#20986
           TabOrder = 5
           OnClick = Buttonp1s2Click
-          ExplicitLeft = 1272
         end
         object Edtt1s1: TEdit
           Left = 97
@@ -251,13 +246,11 @@ object FormHome: TFormHome
         ViewStyle = vsReport
         OnData = ListView1Data
         OnResize = ListView1Resize
-        ExplicitWidth = 1375
       end
     end
     object Tss2: TTabSheet
-      Caption = #26816#39564#27169#22359#23548#20986#39033#30446
+      Caption = #26816#39564#39033#30446#21040#20837#21040#24179#21488
       ImageIndex = 1
-      TabVisible = False
       OnShow = Tss2Show
       object Gauge2: TGauge
         Left = 0
@@ -327,7 +320,6 @@ object FormHome: TFormHome
           Caption = #23548#20837'excel'
           TabOrder = 0
           OnClick = Buttont2s1Click
-          ExplicitLeft = 1173
         end
         object Cbbt2s1: TComboBox
           Left = 493
@@ -350,7 +342,6 @@ object FormHome: TFormHome
           Caption = #26679#21697#21305#37197
           TabOrder = 2
           OnClick = Buttont2s2Click
-          ExplicitLeft = 1061
         end
         object Buttont2s3: TButton
           Left = 1317
@@ -361,7 +352,6 @@ object FormHome: TFormHome
           Caption = #25209#37327#19978#20256
           TabOrder = 3
           OnClick = Buttont2s3Click
-          ExplicitLeft = 1281
         end
         object Edtt2s1: TEdit
           Left = 97
@@ -470,14 +460,12 @@ object FormHome: TFormHome
         OnData = ListView2Data
         OnDblClick = ListView2DblClick
         OnResize = ListView2Resize
-        ExplicitWidth = 1375
       end
     end
     object Tss3: TTabSheet
       Caption = #26816#39564#27169#22359
       ImageIndex = 3
       OnShow = Tss3Show
-      ExplicitWidth = 1381
       object Gauge3: TGauge
         Left = 0
         Top = 589
@@ -496,7 +484,6 @@ object FormHome: TFormHome
         Caption = 'Pnl1'
         ShowCaption = False
         TabOrder = 0
-        ExplicitWidth = 1381
         DesignSize = (
           1417
           89)
