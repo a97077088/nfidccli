@@ -13,7 +13,7 @@ var addr = "122.51.93.214:14662"
 var w, r bool
 
 //打开调试模式
-var debug = false
+var debug = true
 
 var nfidcproc proc.NifdcrpcClient
 
