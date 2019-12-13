@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/a97077088/addrmgr"
 	"github.com/a97077088/chinese-holidays-go/holidays"
 	"github.com/a97077088/nettool"
@@ -19,7 +18,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"nfidccli/models"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -410,49 +408,43 @@ func (f *TFormHome) OnButtont2s1Click(sender vcl.IObject) {
 			f.uploaddatas_lk.Lock()
 			f.uploaddatas = nil
 			f.uploaddatas_lk.Unlock()
-			xlsx, err := excelize.OpenFile(fname)
+			xsfile, err := xlsx.OpenFile(fname)
 			if err != nil {
 				return err
 			}
-			if xlsx.SheetCount == 0 {
+			if len(xsfile.Sheets)== 0 {
 				return errors.New("excel是空数据")
 			}
-			sheetname := xlsx.GetSheetMap()[1]
-			rows := xlsx.GetRows(sheetname)
-			for _, row := range rows {
 
-				ok, err := regexp.MatchString(`NCP\d+|DC\d+`, row[0])
-				if err != nil {
-					return err
-				}
-				if ok == false {
+			rows := xsfile.Sheets[0].Rows
+			for idx, row := range rows {
+				if len(row.Cells)<17||idx==0{
 					continue
 				}
-
-				d := f.GetUploadDataOrCreate(row[0])
+				d := f.GetUploadDataOrCreate(row.Cells[0].Value)
 				d.SSEV("样品匹配", "否")
-				d.SSEV("抽样单编号", row[0])
-				d.SSEV("报告书编号", row[1])
+				d.SSEV("抽样单编号", row.Cells[0].Value)
+				d.SSEV("报告书编号", row.Cells[1].Value)
 				d.SSEV("检测项目", "双击查看")
-				d.SSEV("监督抽检报告备注", row[14])
-				d.SSEV("风险监测报告备注", row[15])
+				d.SSEV("监督抽检报告备注", row.Cells[14].Value)
+				d.SSEV("风险监测报告备注", row.Cells[15].Value)
 				d.SSEV("上传状态", "否")
 				d.SSEV("上传结果", "")
-				d.SSEV("样品名称", row[16])
+				d.SSEV("样品名称", row.Cells[16].Value)
 
 				d.AddSubitem(map[string]string{
-					"检验项目":  row[2],
-					"检验结果":  row[3],
-					"结果单位":  row[4],
-					"结果判定":  row[5],
-					"检验依据":  row[6],
-					"判定依据":  row[7],
-					"最小允许限": row[8],
-					"最大允许限": row[9],
-					"允许限单位": row[10],
-					"方法检出限": row[11],
-					"检出限单位": row[12],
-					"说明":    row[13],
+					"检验项目":  row.Cells[2].Value,
+					"检验结果":  row.Cells[3].Value,
+					"结果单位":  row.Cells[4].Value,
+					"结果判定":  row.Cells[5].Value,
+					"检验依据":  row.Cells[6].Value,
+					"判定依据":  row.Cells[7].Value,
+					"最小允许限": row.Cells[8].Value,
+					"最大允许限": row.Cells[9].Value,
+					"允许限单位": row.Cells[10].Value,
+					"方法检出限": row.Cells[11].Value,
+					"检出限单位": row.Cells[12].Value,
+					"说明":    row.Cells[13].Value,
 				})
 			}
 			vcl.ThreadSync(func() {
@@ -517,13 +509,13 @@ func (f *TFormHome) OnButtont2s2Click(sender vcl.IObject) {
 			var dds *nifdc.Api_food_getFood_r
 			var err error
 			if tp == 0 {
-				dds, err = nifdc.Test_platform_api_food_getFood(taskfrom, 1, sd, ed, 0, 10000, "sp_d_46", "desc", f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_food_getFood(taskfrom, 8, sd, ed, 0, 10000, "", "desc", f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
 			}
 			if tp == 1 {
-				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, 1, sd, ed, 0, 10000, "sp_d_46", "desc", f.test_platform_ck, nil)
+				dds, err = nifdc.Test_platform_api_agriculture_getAgriculture(taskfrom, 8, sd, ed, 0, 10000, "", "desc", f.test_platform_ck, nil)
 				if err != nil {
 					return err
 				}
