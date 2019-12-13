@@ -1336,11 +1336,30 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 				}
 				tr := itr.(map[string]string)
 				itsubtr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, err error) {
-					r, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
-					if err != nil {
-						return nil, err
+					if tp == 0 { //普通食品
+						testinfor, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						itemsr,err:=nifdc.Test_platform_api_food_getTestItems(tr,f.test_platform_ck,nil)
+						if err != nil {
+							return nil, err
+						}
+						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						return rmp, nil
+					} else if tp == 1 { //农产品
+						testinfor, err := nifdc.Test_platform_api_agriculture_getTestInfo(tr["sd"], f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						itemsr,err:=nifdc.Test_platform_api_agriculture_getTestItems(tr,f.test_platform_ck,nil)
+						if err != nil {
+							return nil, err
+						}
+						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						return rmp, nil
 					}
-					return nifdc.TestInfotoMap(r.Rows), nil
+					return nil, errors.New("不支持的模式")
 				})
 				if err != nil {
 					return err
@@ -1509,11 +1528,30 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_web(thread int, data []*nifdc.Api
 				}
 				tr := itr.(map[string]string)
 				itsubtr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, err error) {
-					r, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
-					if err != nil {
-						return nil, err
+					if tp == 0 { //普通食品
+						testinfor, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						itemsr,err:=nifdc.Test_platform_api_food_getTestItems(tr,f.test_platform_ck,nil)
+						if err != nil {
+							return nil, err
+						}
+						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						return rmp, nil
+					} else if tp == 1 { //农产品
+						testinfor, err := nifdc.Test_platform_api_agriculture_getTestInfo(tr["sd"], f.test_platform_ck, nil)
+						if err != nil {
+							return nil, err
+						}
+						itemsr,err:=nifdc.Test_platform_api_agriculture_getTestItems(tr,f.test_platform_ck,nil)
+						if err != nil {
+							return nil, err
+						}
+						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						return rmp, nil
 					}
-					return nifdc.TestInfotoMap(r.Rows), nil
+					return nil, errors.New("不支持的模式")
 				})
 				if err != nil {
 					return err

@@ -693,7 +693,7 @@ object FormHome: TFormHome
           OnClick = Buttonp3s4Click
         end
         object Buttonp3s5: TButton
-          Left = 1299
+          Left = 1307
           Top = 4
           Width = 98
           Height = 38
