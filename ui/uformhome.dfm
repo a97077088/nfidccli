@@ -272,6 +272,10 @@ object FormHome: TFormHome
       Caption = #26816#39564#39033#30446#21040#20837#21040#24179#21488
       ImageIndex = 1
       OnShow = Tss2Show
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Gauge2: TGauge
         Left = 0
         Top = 589
@@ -730,6 +734,7 @@ object FormHome: TFormHome
           Anchors = [akTop, akRight]
           Caption = #39033#30446#21040#32593#31449
           TabOrder = 12
+          Visible = False
           OnClick = Buttonp3s6Click
         end
       end
@@ -835,15 +840,17 @@ object FormHome: TFormHome
       Caption = #31995#32479#35774#32622
       ImageIndex = 2
       TabVisible = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label1: TLabel
         Left = 0
         Top = 0
-        Width = 1417
-        Height = 630
+        Width = 90
+        Height = 24
         Align = alClient
         Caption = #26242#26102#26080#35774#32622
-        ExplicitWidth = 90
-        ExplicitHeight = 24
       end
     end
   end
