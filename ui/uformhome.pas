@@ -71,6 +71,8 @@ type
     Buttonp3s4: TButton;
     Buttonp3s5: TButton;
     Buttonp3s6: TButton;
+    Buttonp1s3: TButton;
+    Buttonp1s4: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure Tss1Show(Sender: TObject);
@@ -97,6 +99,8 @@ type
     procedure Buttonp3s4Click(Sender: TObject);
     procedure Buttonp3s5Click(Sender: TObject);
     procedure Buttonp3s6Click(Sender: TObject);
+    procedure Buttonp1s3Click(Sender: TObject);
+    procedure Buttonp1s4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -116,6 +120,16 @@ begin
 end;
 
 procedure TFormHome.Buttonp1s2Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp1s3Click(Sender: TObject);
+begin
+//
+end;
+
+procedure TFormHome.Buttonp1s4Click(Sender: TObject);
 begin
 //
 end;

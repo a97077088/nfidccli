@@ -26,7 +26,7 @@ object FormHome: TFormHome
     Width = 1425
     Height = 669
     Margins.Top = 10
-    ActivePage = Tss3
+    ActivePage = Tss1
     Align = alClient
     TabOrder = 0
     object Tss1: TTabSheet
@@ -153,7 +153,7 @@ object FormHome: TFormHome
           TabOrder = 3
         end
         object Buttonp1s1: TButton
-          Left = 1308
+          Left = 1196
           Top = 0
           Width = 89
           Height = 38
@@ -163,8 +163,8 @@ object FormHome: TFormHome
           OnClick = Buttonp1s1Click
         end
         object Buttonp1s2: TButton
-          Left = 1308
-          Top = 42
+          Left = 1196
+          Top = 48
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
@@ -178,6 +178,26 @@ object FormHome: TFormHome
           Width = 291
           Height = 32
           TabOrder = 6
+        end
+        object Buttonp1s3: TButton
+          Left = 1308
+          Top = 0
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #20219#21153#21040'sql'
+          TabOrder = 7
+          OnClick = Buttonp1s3Click
+        end
+        object Buttonp1s4: TButton
+          Left = 1308
+          Top = 48
+          Width = 89
+          Height = 38
+          Anchors = [akTop, akRight]
+          Caption = #21024#38500#20219#21153
+          TabOrder = 8
+          OnClick = Buttonp1s4Click
         end
       end
       object ListView1: TListView
@@ -598,7 +618,7 @@ object FormHome: TFormHome
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
-          Caption = #23548#20986'sql'
+          Caption = #20219#21153#21040'sql'
           TabOrder = 4
           OnClick = Buttonp3s2Click
         end
@@ -678,7 +698,7 @@ object FormHome: TFormHome
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
-          Caption = #21024#38500
+          Caption = #20219#21153#21024#38500
           TabOrder = 9
           OnClick = Buttonp3s3Click
         end
@@ -688,7 +708,7 @@ object FormHome: TFormHome
           Width = 89
           Height = 38
           Anchors = [akTop, akRight]
-          Caption = #23548#20986'excel'
+          Caption = #20219#21153'excel'
           TabOrder = 10
           OnClick = Buttonp3s4Click
         end

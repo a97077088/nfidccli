@@ -46,6 +46,7 @@ type TFormHomeFields struct {
 	test_platform_init bool
 	test_platform_ck   string
 
+	renwudapingtaisql_rule    [][]string
 	jianyanjieguosql_rule    [][]string
 	jianyanjieguoexcel_rule  [][]string
 	renwudapingtaiexcel_rule [][]string
@@ -563,6 +564,13 @@ func (f *TFormHome) OnTss2Show(sender vcl.IObject) {
 	}
 }
 func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
+	tp := 0
+	if f.Cbbt2s1.ItemIndex() == 0 {
+		tp = 0
+	}
+	if f.Cbbt2s1.ItemIndex() == 1 {
+		tp = 1
+	}
 	f.Buttont2s3.SetEnabled(false)
 	go func() {
 		defer vcl.ThreadSync(func() {
@@ -591,41 +599,81 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 							return errors.New("没有匹配数据")
 						}
 						err := nettool.RNet_Call(nil, func(source *addrmgr.AddrSource) error {
-							fddetail, err := nifdc.Test_platform_foodTest_foodDetail(td.Env_for_key("id").(int), f.test_platform_ck, nil)
-							if err != nil {
-								return err
-							}
-							testinfo, err := nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
-							if err != nil {
-								return err
-							}
-							subitem := _td.Subitem()
-							unqualifieds := nifdc.Getunqualified(subitem)
-							jielun := "纯抽检合格样品"
-							baogaoleibie := "合格报告"
-							if len(unqualifieds) != 0 {
-								jielun = "纯抽检不合格样品"
-								baogaoleibie = "一般不合格报告"
-							}
-							jiancejielun := nifdc.Buildbaogao(subitem)
+							if tp==0{
+								fddetail, err := nifdc.Test_platform_foodTest_foodDetail(td.Env_for_key("id").(int), f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+								testinfo, err := nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+								subitem := _td.Subitem()
+								unqualifieds := nifdc.Getunqualified(subitem)
+								jielun := "纯抽检合格样品"
+								baogaoleibie := "合格报告"
+								if len(unqualifieds) != 0 {
+									jielun = "纯抽检不合格样品"
+									baogaoleibie = "一般不合格报告"
+								}
+								jiancejielun := nifdc.Buildbaogao(subitem)
 
-							nifdc.Fill_item(map[string]string{
-								"报告书编号":    _td.SEV("报告书编号"),
-								"监督抽检报告备注": _td.SEV("监督抽检报告备注"),
-								"风险监测报告备注": _td.SEV("风险监测报告备注"),
-								"结论":       jielun,
-								"报告类别":     baogaoleibie,
-								"检验结论":     jiancejielun,
-							}, fddetail)
-							nifdc.Fill_subitem(subitem, testinfo.Rows)
-							err = nifdc.Test_platform_api_food_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
-							if err != nil {
-								return err
+								nifdc.Fill_item(map[string]string{
+									"报告书编号":    _td.SEV("报告书编号"),
+									"监督抽检报告备注": _td.SEV("监督抽检报告备注"),
+									"风险监测报告备注": _td.SEV("风险监测报告备注"),
+									"结论":       jielun,
+									"报告类别":     baogaoleibie,
+									"检验结论":     jiancejielun,
+								}, fddetail)
+								nifdc.Fill_subitem(subitem, testinfo.Rows)
+								err = nifdc.Test_platform_api_food_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+
+								atomic.AddInt32(&nok, 1)
+								_td.SSEV("上传结果", "成功")
+								return nil
+							}else if tp==1{
+								fddetail, err := nifdc.Test_platform_agricultureTest_agricultureDetail(td.Env_for_key("id").(int), f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+								testinfo, err := nifdc.Test_platform_api_agriculture_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+								subitem := _td.Subitem()
+								unqualifieds := nifdc.Getunqualified(subitem)
+								jielun := "纯抽检合格样品"
+								baogaoleibie := "合格报告"
+								if len(unqualifieds) != 0 {
+									jielun = "纯抽检不合格样品"
+									baogaoleibie = "一般不合格报告"
+								}
+								jiancejielun := nifdc.Buildbaogao(subitem)
+
+								nifdc.Fill_item(map[string]string{
+									"报告书编号":    _td.SEV("报告书编号"),
+									"监督抽检报告备注": _td.SEV("监督抽检报告备注"),
+									"风险监测报告备注": _td.SEV("风险监测报告备注"),
+									"结论":       jielun,
+									"报告类别":     baogaoleibie,
+									"检验结论":     jiancejielun,
+								}, fddetail)
+								nifdc.Fill_subitem(subitem, testinfo.Rows)
+								err = nifdc.Test_platform_api_agriculture_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
+								if err != nil {
+									return err
+								}
+
+								atomic.AddInt32(&nok, 1)
+								_td.SSEV("上传结果", "成功")
+								return nil
 							}
 
-							atomic.AddInt32(&nok, 1)
-							_td.SSEV("上传结果", "成功")
-							return nil
+							return errors.New("不支持这个模式")
 						})
 						if err != nil {
 							return err
@@ -904,7 +952,7 @@ func (f *TFormHome) cv_jianyanrenwu_dbv(dbk string, v string) string {
 }
 
 //下载检验任务导出到sql
-func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_food_getFood_o, tp int) error {
+func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_food_getFood_o, tp int) error {
 	if models.Ctx() == nil {
 		return errors.New("数据库未配置")
 	}
@@ -951,51 +999,97 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_
 				}
 				if cn != 0 {
 					//已导入的跳过
+					fds := []string{
+
+					}
+					vds := []string{
+					}
+
+					tmj := template.New("tmj")
+					tmj.Funcs(map[string]interface{}{
+						"replace": strings.ReplaceAll,
+					})
+					for _, it := range f.jianyanjieguosql_rule {
+						dbk := it[0]
+						webk := it[1]
+						fds = append(fds, dbk)
+
+						_, err = tmj.Parse(webk)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						var tmpwebv bytes.Buffer
+
+						err := tmj.Execute(&tmpwebv, tr)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
+						vds = append(vds, webv)
+					}
+
+					forupdates:=[]string{}
+					for idx,fd:=range fds{
+						forupdates=append(forupdates,fmt.Sprintf("%s=%s",fd,vds[idx],))
+					}
+
+					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates,",")),fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),).Error
+					if err != nil {
+						return err
+					}
 					atomic.AddInt32(&nrey, 1)
+					_d.User.SSEV("处理结果", "更新")
+					return nil
+				}else{
+					fds := []string{
+						"id",
+						"任务编号",
+						"抽样单号",
+					}
+					vds := []string{
+						fmt.Sprintf("'%s'", models.Build_id()),
+						fmt.Sprintf("'%s'", models.Build_taskid()),
+						fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),
+					}
+
+					tmj := template.New("tmj")
+					tmj.Funcs(map[string]interface{}{
+						"replace": strings.ReplaceAll,
+					})
+					for _, it := range f.jianyanjieguosql_rule {
+						dbk := it[0]
+						webk := it[1]
+						fds = append(fds, dbk)
+
+						_, err = tmj.Parse(webk)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						var tmpwebv bytes.Buffer
+
+						err := tmj.Execute(&tmpwebv, tr)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
+						vds = append(vds, webv)
+					}
+					err = models.Ctx().Exec(fmt.Sprintf("insert into 检验任务 (%s) values (%s)", strings.Join(fds, ","), strings.Join(vds, ","))).Error
+					if err != nil {
+						return err
+					}
+					atomic.AddInt32(&nok, 1)
+					_d.User.SSEV("处理结果", "完成")
 					return nil
 				}
-				fds := []string{
-					"id",
-					"任务编号",
-					"抽样单号",
-				}
-				vds := []string{
-					fmt.Sprintf("'%s'", models.Build_id()),
-					fmt.Sprintf("'%s'", models.Build_taskid()),
-					fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),
-				}
-
-				tmj := template.New("tmj")
-				tmj.Funcs(map[string]interface{}{
-					"replace": strings.ReplaceAll,
-				})
-				for _, it := range f.jianyanjieguosql_rule {
-					dbk := it[0]
-					webk := it[1]
-					fds = append(fds, dbk)
-
-					_, err = tmj.Parse(webk)
-					if err != nil {
-						fmt.Println(err)
-						return err
-					}
-
-					var tmpwebv bytes.Buffer
-
-					err := tmj.Execute(&tmpwebv, tr)
-					if err != nil {
-						fmt.Println(err)
-						return err
-					}
-
-					webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
-					vds = append(vds, webv)
-				}
-				err = models.Ctx().Exec(fmt.Sprintf("insert into 检验任务 (%s) values (%s)", strings.Join(fds, ","), strings.Join(vds, ","))).Error
-				if err != nil {
-					return err
-				}
-				atomic.AddInt32(&nok, 1)
 				return nil
 			}()
 			if err != nil {
@@ -1003,14 +1097,13 @@ func (f *TFormHome) Exportxiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_
 				_d.User.SSEV("处理结果", err.Error())
 				return err
 			}
-			_d.User.SSEV("处理结果", "完成")
 			return nil
 		})
 
 	}
 	th.Wait()
 	vcl.ThreadSync(func() {
-		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n已存在:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n更新:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
 	})
 	return nil
 }
@@ -1047,7 +1140,7 @@ func (f *TFormHome) OnButtonp3s2Click(sender vcl.IObject) {
 				f.Gauge3.SetProgress(0)
 				f.Gauge3.SetMaxValue(int32(len(tmpds)))
 			})
-			err = f.Exportxiazaijianyanjieguo_sql(thread, tmpds, tp)
+			err = f.Exportxiazaijianyanrenwu_sql(thread, tmpds, tp)
 			if err != nil {
 				return err
 			}
@@ -1063,7 +1156,7 @@ func (f *TFormHome) OnButtonp3s2Click(sender vcl.IObject) {
 }
 
 //删除检验结果导出到sql
-func (f *TFormHome) Deletexiazaijianyanjieguo_sql(thread int, data []*nifdc.Api_food_getFood_o) error {
+func (f *TFormHome) Deletexiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_food_getFood_o) error {
 	if models.Ctx() == nil {
 		return errors.New("数据库未配置")
 	}
@@ -1125,7 +1218,7 @@ func (f *TFormHome) OnButtonp3s3Click(sender vcl.IObject) {
 				f.Gauge3.SetProgress(0)
 				f.Gauge3.SetMaxValue(int32(len(tmpds)))
 			})
-			err := f.Deletexiazaijianyanjieguo_sql(thread, tmpds)
+			err := f.Deletexiazaijianyanrenwu_sql(thread, tmpds)
 			if err != nil {
 				return err
 			}
@@ -1141,7 +1234,7 @@ func (f *TFormHome) OnButtonp3s3Click(sender vcl.IObject) {
 }
 
 //下载检验结果导出到excel
-func (f *TFormHome) Exportxiazaijianyanjieguo_excel(thread int, data []*nifdc.Api_food_getFood_o, fname string, tp int) error {
+func (f *TFormHome) Exportxiazaijianyanrenwu_excel(thread int, data []*nifdc.Api_food_getFood_o, fname string, tp int) error {
 	for _, d := range data {
 		d.User.SSEV("处理状态", "")
 		d.User.SSEV("处理结果", "")
@@ -1279,7 +1372,7 @@ func (f *TFormHome) OnButtonp3s4Click(sender vcl.IObject) {
 				f.Gauge3.SetProgress(0)
 				f.Gauge3.SetMaxValue(int32(len(tmpds)))
 			})
-			err = f.Exportxiazaijianyanjieguo_excel(thread, tmpds, fname, tp)
+			err = f.Exportxiazaijianyanrenwu_excel(thread, tmpds, fname, tp)
 			if err != nil {
 				return err
 			}
@@ -1654,3 +1747,276 @@ func (f *TFormHome) OnButtonp3s6Click(sender vcl.IObject) {
 		}
 	}()
 }
+
+
+//下载任务大平台导出到sql
+func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Data_o, ) error {
+	if models.Ctx() == nil {
+		return errors.New("数据库未配置")
+	}
+	for _, d := range data {
+		d.User.SSEV("处理状态", "")
+		d.User.SSEV("处理结果", "")
+	}
+	nerr := int32(0)
+	nok := int32(0)
+	nrey := int32(0)
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(f.Gauge3.Progress() + 1)
+				_d.User.SSEV("处理状态", "完成")
+			})
+			err := func() error {
+				itr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, e error) {
+					tr, err := nifdc.Viewcheckedsample_full(_d.Sample_code, f.sample_ck, nil)
+					if err != nil {
+						return nil, err
+					}
+					return tr, nil
+				})
+				if err != nil {
+					return err
+				}
+				tr := itr.(map[string]string)
+				cn := 0
+				err = models.Ctx().Model(&models.Jianyanrenwu{}).Where("抽样单号=?", tr["抽样基础信息_抽样单编号"]).Count(&cn).Error
+				if err != nil {
+					return err
+				}
+				if cn != 0 {
+					//已导入的跳过
+					fds := []string{
+
+					}
+					vds := []string{
+					}
+
+					tmj := template.New("tmj")
+					tmj.Funcs(map[string]interface{}{
+						"replace": strings.ReplaceAll,
+					})
+					for _, it := range f.renwudapingtaisql_rule {
+						dbk := it[0]
+						webk := it[1]
+						fds = append(fds, dbk)
+
+						_, err = tmj.Parse(webk)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						var tmpwebv bytes.Buffer
+
+						err := tmj.Execute(&tmpwebv, tr)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
+						vds = append(vds, webv)
+					}
+
+					forupdates:=[]string{}
+					for idx,fd:=range fds{
+						forupdates=append(forupdates,fmt.Sprintf("%s=%s",fd,vds[idx],))
+					}
+
+					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates,",")),fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),).Error
+					if err != nil {
+						return err
+					}
+					atomic.AddInt32(&nrey, 1)
+					_d.User.SSEV("处理结果", "更新")
+					return nil
+				}else{
+					fds := []string{
+						"id",
+						"任务编号",
+						"抽样单号",
+					}
+					vds := []string{
+						fmt.Sprintf("'%s'", models.Build_id()),
+						fmt.Sprintf("'%s'", models.Build_taskid()),
+						fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),
+					}
+
+					tmj := template.New("tmj")
+					tmj.Funcs(map[string]interface{}{
+						"replace": strings.ReplaceAll,
+					})
+					for _, it := range f.renwudapingtaisql_rule {
+						dbk := it[0]
+						webk := it[1]
+						fds = append(fds, dbk)
+
+						_, err = tmj.Parse(webk)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						var tmpwebv bytes.Buffer
+
+						err := tmj.Execute(&tmpwebv, tr)
+						if err != nil {
+							fmt.Println(err)
+							return err
+						}
+
+						webv := f.cv_jianyanrenwu_dbv(dbk, tmpwebv.String())
+						vds = append(vds, webv)
+					}
+					err = models.Ctx().Exec(fmt.Sprintf("insert into 检验任务 (%s) values (%s)", strings.Join(fds, ","), strings.Join(vds, ","))).Error
+					if err != nil {
+						return err
+					}
+					atomic.AddInt32(&nok, 1)
+					_d.User.SSEV("处理结果", "完成")
+					return nil
+				}
+				return nil
+			}()
+			if err != nil {
+				atomic.AddInt32(&nerr, 1)
+				_d.User.SSEV("处理结果", err.Error())
+				return err
+			}
+			return nil
+		})
+
+	}
+	th.Wait()
+	vcl.ThreadSync(func() {
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n更新:%d", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr), atomic.LoadInt32(&nrey)))
+	})
+	return nil
+}
+//导出任务大平台到sql
+func (f *TFormHome) OnButtonp1s3Click(sender vcl.IObject) {
+	f.sample_ds_lk.Lock()
+	tmpds := f.sample_ds
+	f.sample_ds_lk.Unlock()
+	f.Buttonp1s3.SetEnabled(false)
+	go func() {
+		defer vcl.ThreadSync(func() {
+			f.Buttonp1s3.SetEnabled(true)
+		})
+		err := func() error {
+			if w == false {
+				return nil
+			}
+			var err error
+			f.renwudapingtaisql_rule, err = f.readrule("./下载任务大平台sql规则.txt")
+			if err != nil {
+				return err
+			}
+
+			if tmpds == nil || len(tmpds) == 0 {
+				return errors.New("数据不能为空")
+			}
+			vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(0)
+				f.Gauge1.SetMaxValue(int32(len(tmpds)))
+			})
+			err = f.Exportxiazairenwudapingtai_sql(thread, tmpds,)
+			if err != nil {
+				return err
+			}
+			return nil
+		}()
+		if err != nil {
+			vcl.ThreadSyncVcl(func() {
+				vcl.ShowMessage(err.Error())
+			})
+			return
+		}
+	}()
+}
+
+
+
+
+
+//删除任务大平台导出到sql
+func (f *TFormHome) Deleterenwudapingtai_sql(thread int, data []*nifdc.Data_o) error {
+	if models.Ctx() == nil {
+		return errors.New("数据库未配置")
+	}
+	for _, d := range data {
+		d.User.SSEV("处理状态", "")
+		d.User.SSEV("处理结果", "")
+	}
+	nerr := int32(0)
+	nok := int32(0)
+	th := threadpool.NewThreadPool(thread, len(data))
+	for _, d := range data {
+		_d := d
+		th.Req(func() interface{} {
+			defer vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(f.Gauge3.Progress() + 1)
+				_d.User.SSEV("处理状态", "完成")
+			})
+			err := func() error {
+				err := models.Ctx().Delete(&models.Jianyanrenwu{}, "抽样单号=?", _d.Sample_code).Error
+				if err != nil {
+					return err
+				}
+				atomic.AddInt32(&nok, 1)
+				return nil
+			}()
+			if err != nil {
+				atomic.AddInt32(&nerr, 1)
+				_d.User.SSEV("处理结果", err.Error())
+				return err
+			}
+			_d.User.SSEV("处理结果", "完成")
+			return nil
+		})
+
+	}
+	th.Wait()
+	vcl.ThreadSync(func() {
+		vcl.ShowMessage(fmt.Sprintf("成功:%d\n\n失败:%d\n\n", atomic.LoadInt32(&nok), atomic.LoadInt32(&nerr)))
+	})
+	return nil
+}
+func (f *TFormHome) OnButtonp1s4Click(sender vcl.IObject) {
+	f.sample_ds_lk.Lock()
+	tmpds := f.sample_ds
+	f.sample_ds_lk.Unlock()
+	f.Buttonp1s4.SetEnabled(false)
+	go func() {
+		defer vcl.ThreadSync(func() {
+			f.Buttonp1s4.SetEnabled(true)
+		})
+		err := func() error {
+			if w == false {
+				return nil
+			}
+			if tmpds == nil || len(tmpds) == 0 {
+				return errors.New("数据不能为空")
+			}
+			vcl.ThreadSync(func() {
+				f.Gauge1.SetProgress(0)
+				f.Gauge1.SetMaxValue(int32(len(tmpds)))
+			})
+			err := f.Deleterenwudapingtai_sql(thread, tmpds)
+			if err != nil {
+				return err
+			}
+			return nil
+		}()
+		if err != nil {
+			vcl.ThreadSyncVcl(func() {
+				vcl.ShowMessage(err.Error())
+			})
+			return
+		}
+	}()
+}
+
