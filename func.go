@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"regexp"
 )
 
 func enmp(mp map[string]string) string {
@@ -29,4 +30,9 @@ func demp(s string) map[string]string {
 		return nil
 	}
 	return mp
+}
+
+func replaceex(s string,old string,new string)string{
+	ex:=regexp.MustCompile(old)
+	return ex.ReplaceAllString(s,new)
 }

@@ -258,6 +258,7 @@ func (f *TFormHome) Exportrenwudapingtai_excel(thread int, data []*nifdc.Data_o,
 				tmj := template.New("tmj")
 				tmj.Funcs(map[string]interface{}{
 					"replace": strings.ReplaceAll,
+					"replaceex": replaceex,
 				})
 				for _, it := range f.renwudapingtaiexcel_rule {
 					webk := it[1]
@@ -1008,6 +1009,7 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_f
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
 						"replace": strings.ReplaceAll,
+						"replaceex": replaceex,
 					})
 					for _, it := range f.jianyanjieguosql_rule {
 						dbk := it[0]
@@ -1059,6 +1061,7 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_f
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
 						"replace": strings.ReplaceAll,
+						"replaceex": replaceex,
 					})
 					for _, it := range f.jianyanjieguosql_rule {
 						dbk := it[0]
@@ -1291,6 +1294,7 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_excel(thread int, data []*nifdc.Api
 				tmj := template.New("tmj")
 				tmj.Funcs(map[string]interface{}{
 					"replace": strings.ReplaceAll,
+					"replaceex": replaceex,
 				})
 				for _, it := range f.jianyanjieguoexcel_rule {
 					webk := it[1]
@@ -1797,6 +1801,7 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
 						"replace": strings.ReplaceAll,
+						"replaceex": replaceex,
 					})
 					for _, it := range f.renwudapingtaisql_rule {
 						dbk := it[0]
@@ -1848,6 +1853,7 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
 						"replace": strings.ReplaceAll,
+						"replaceex": replaceex,
 					})
 					for _, it := range f.renwudapingtaisql_rule {
 						dbk := it[0]
