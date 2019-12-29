@@ -1468,6 +1468,16 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 					return err
 				}
 
+
+				jianyanshi:="GC"
+				jianyanyuan:="检验员"
+				jindu:="20"
+				if user=="15738889730"{
+					jianyanshi="YJ"
+					jianyanyuan="检验员"
+					jindu="0"
+				}
+
 				for idx, subr := range subtr {
 					subidx := idx + 1
 					rn := 0
@@ -1492,9 +1502,9 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							subr["方法检出限*"],
 							subr["最大允许限*"],
 							subr["备注"],
-							"GC",
-							"检验员",
-							"20",
+							jianyanshi,
+							jianyanyuan,
+							jindu,
 							"0",
 						).Error
 						if err != nil {
