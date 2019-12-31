@@ -1472,7 +1472,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 				jianyanshi:="GC"
 				jianyanyuan:="检验员"
 				jindu:="20"
-				if user=="15738889730"{
+				if user=="15738889730"|| user=="18039661206"{
 					jianyanshi="YJ"
 					jianyanyuan="检验员"
 					jindu="0"
