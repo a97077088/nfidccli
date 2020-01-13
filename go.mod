@@ -10,7 +10,7 @@ require (
 	github.com/a97077088/appuser v0.0.0-20190927081129-fb44efe834a1
 	github.com/a97077088/chinese-holidays-go v0.0.0-20191128133315-349871c1ecb0
 	github.com/a97077088/nettool v0.0.0-20190927091157-ec40b0993cc2
-	github.com/a97077088/nifdc v0.0.0-20191019115534-5cd00a9a9ab5
+	github.com/a97077088/nifdc v0.0.0-20200113034648-63657955a98e
 	github.com/a97077088/threadpool v0.0.0-20190925091556-2981d99ff157
 	github.com/alexbrainman/odbc v0.0.0-20190102080306-cf37ce290779
 	github.com/bastengao/chinese-holidays-go v0.0.0-20191122025511-79dd3c1351fb
