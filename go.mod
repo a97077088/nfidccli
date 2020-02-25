@@ -2,7 +2,7 @@ module nfidccli
 
 go 1.13
 
-replace github.com/a97077088/nifdc => ../nifdc
+//replace github.com/a97077088/nifdc => ../nifdc
 
 require (
 	github.com/PuerkitoBio/goquery v1.5.1-0.20191015220908-b17a2bbb6dc1 // indirect
