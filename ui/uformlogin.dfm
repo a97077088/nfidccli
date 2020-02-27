@@ -37,7 +37,7 @@ object FormLogin: TFormLogin
     Top = 259
     Width = 98
     Height = 24
-    Caption = 'v2020.0.2.1'
+    Caption = 'v2020.0.2.2'
   end
   object LabelEdit1: TLabeledEdit
     Left = 128
