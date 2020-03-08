@@ -608,25 +608,16 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								if err != nil {
 									return err
 								}
+								testitems,err:=nifdc.Test_platform_api_food_getTestItems(fddetail,f.test_platform_ck,nil)
+								if err != nil {
+									return err
+								}
 								testinfo, err := nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
+								updatas:=nifdc.Build_agriculture_updata(testitems.Rows,testinfo.Rows,_td.Subitem())
 
-								if len(testinfo.Rows)==0{
-									testitems,err:=nifdc.Test_platform_api_food_getTestItems(fddetail,f.test_platform_ck,nil)
-									if err != nil {
-										return err
-									}
-									err = nifdc.Test_platform_api_food_init(fddetail, testitems.Rows, f.test_platform_ck, nil)
-									if err != nil {
-										return err
-									}
-									testinfo, err = nifdc.Test_platform_api_food_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
-									if err != nil {
-										return err
-									}
-								}
 								subitem := _td.Subitem()
 								unqualifieds := nifdc.Getunqualified(subitem)
 								jielun := "纯抽检合格样品"
@@ -646,7 +637,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 									"检验结论":     jiancejielun,
 								}, fddetail)
 								nifdc.Fill_subitem(subitem, testinfo.Rows)
-								err = nifdc.Test_platform_api_food_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
+								err = nifdc.Test_platform_api_food_save(fddetail, updatas, f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
@@ -661,27 +652,17 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								}
 								//fmt.Println(fddetail["sample_code"])
 
+								testitems,err:=nifdc.Test_platform_api_agriculture_getTestItems(fddetail,f.test_platform_ck,nil)
+								if err != nil {
+									return err
+								}
 								testinfo, err := nifdc.Test_platform_api_agriculture_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
-								if len(testinfo.Rows)==0{
-									testitems,err:=nifdc.Test_platform_api_agriculture_getTestItems(fddetail,f.test_platform_ck,nil)
-									if err != nil {
-										return err
-									}
-									err = nifdc.Test_platform_api_agriculture_init(fddetail, testitems.Rows, f.test_platform_ck, nil)
-									if err != nil {
-										return err
-									}
-									testinfo, err = nifdc.Test_platform_api_agriculture_getTestInfo(fddetail["sd"], f.test_platform_ck, nil)
-									if err != nil {
-										return err
-									}
-								}
+								updatas:=nifdc.Build_agriculture_updata(testitems.Rows,testinfo.Rows,_td.Subitem())
 
 								subitem := _td.Subitem()
-
 								unqualifieds := nifdc.Getunqualified(subitem)
 								jielun := "纯抽检合格样品"
 								baogaoleibie := "合格报告"
@@ -699,8 +680,8 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 									"报告类别":     baogaoleibie,
 									"检验结论":     jiancejielun,
 								}, fddetail)
-								nifdc.Fill_subitem(subitem, testinfo.Rows)
-								err = nifdc.Test_platform_api_agriculture_save(fddetail, testinfo.Rows, f.test_platform_ck, nil)
+
+								err = nifdc.Test_platform_api_agriculture_save(fddetail, updatas, f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
