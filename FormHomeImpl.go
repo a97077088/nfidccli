@@ -423,30 +423,30 @@ func (f *TFormHome) OnButtont2s1Click(sender vcl.IObject) {
 				if len(row.Cells)<17||idx==0{
 					continue
 				}
-				d := f.GetUploadDataOrCreate(row.Cells[0].Value)
+				d := f.GetUploadDataOrCreate(strings.TrimSpace(row.Cells[0].Value))
 				d.SSEV("样品匹配", "否")
-				d.SSEV("抽样单编号", row.Cells[0].Value)
-				d.SSEV("报告书编号", row.Cells[1].Value)
+				d.SSEV("抽样单编号", strings.TrimSpace(row.Cells[0].Value))
+				d.SSEV("报告书编号", strings.TrimSpace(row.Cells[1].Value))
 				d.SSEV("检测项目", "双击查看")
-				d.SSEV("监督抽检报告备注", row.Cells[14].Value)
-				d.SSEV("风险监测报告备注", row.Cells[15].Value)
+				d.SSEV("监督抽检报告备注", strings.TrimSpace(row.Cells[14].Value))
+				d.SSEV("风险监测报告备注", strings.TrimSpace(row.Cells[15].Value))
 				d.SSEV("上传状态", "否")
 				d.SSEV("上传结果", "")
-				d.SSEV("样品名称", row.Cells[16].Value)
+				d.SSEV("样品名称", strings.TrimSpace(row.Cells[16].Value))
 
 				d.AddSubitem(map[string]string{
-					"检验项目":  row.Cells[2].Value,
-					"检验结果":  row.Cells[3].Value,
-					"结果单位":  row.Cells[4].Value,
-					"结果判定":  row.Cells[5].Value,
-					"检验依据":  row.Cells[6].Value,
-					"判定依据":  row.Cells[7].Value,
-					"最小允许限": row.Cells[8].Value,
-					"最大允许限": row.Cells[9].Value,
-					"允许限单位": row.Cells[10].Value,
-					"方法检出限": row.Cells[11].Value,
-					"检出限单位": row.Cells[12].Value,
-					"说明":    row.Cells[13].Value,
+					"检验项目":  strings.TrimSpace(row.Cells[2].Value),
+					"检验结果":  strings.TrimSpace(row.Cells[3].Value),
+					"结果单位":  strings.TrimSpace(row.Cells[4].Value),
+					"结果判定":  strings.TrimSpace(row.Cells[5].Value),
+					"检验依据":  strings.TrimSpace(row.Cells[6].Value),
+					"判定依据":  strings.TrimSpace(row.Cells[7].Value),
+					"最小允许限": strings.TrimSpace(row.Cells[8].Value),
+					"最大允许限": strings.TrimSpace(row.Cells[9].Value),
+					"允许限单位": strings.TrimSpace(row.Cells[10].Value),
+					"方法检出限": strings.TrimSpace(row.Cells[11].Value),
+					"检出限单位": strings.TrimSpace(row.Cells[12].Value),
+					"说明":    strings.TrimSpace(row.Cells[13].Value),
 				})
 			}
 			vcl.ThreadSync(func() {
