@@ -1451,6 +1451,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 				tr := itr.(map[string]string)
 				itsubtr, err := nettool.RNet_Call_1(&nettool.RNetOptions{}, func(source *addrmgr.AddrSource) (i interface{}, err error) {
 					if tp == 0 { //普通食品
+
 						testinfor, err := nifdc.Test_platform_api_food_getTestInfo(tr["sd"], f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
@@ -1504,56 +1505,115 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 					jindu="0"
 				}
 
-				for idx, subr := range subtr {
-					subidx := idx + 1
-					rn := 0
-					err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("任务编号=? and 项目名称=?", renwu.V任务编号, subr["检验项目*"]).Count(&rn).Error
-					if err != nil {
-						return err
-					}
-					if rn == 0 { //插入
-						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,标准值,备注,检验室,检验员,进度,返工) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-							strconv.Itoa(subidx),
-							renwu.V任务编号,
-							strconv.Itoa(subidx),
-							subr["检验项目*"],
-							tr["抽检样品信息_样品名称"],
-							subr["结果单位*"],
-							subr["检验依据*"],
-							subr["检验结果*"],
-							subr["结果判定*"],
-							subr["判定依据*"],
-							subr["最小允许限*"],
-							subr["最大允许限*"],
-							subr["方法检出限*"],
-							subr["最大允许限*"],
-							subr["备注"],
-							jianyanshi,
-							jianyanyuan,
-							jindu,
-							"0",
-						).Error
+
+				if user=="15738889730"{
+					for idx, subr := range subtr {
+						subidx := idx + 1
+						rn := 0
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("任务编号=? and 项目名称=?", renwu.V任务编号, subr["检验项目*"]).Count(&rn).Error
 						if err != nil {
 							return err
 						}
-					} else { //添加
-						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,标准值=?,备注=? where 任务编号=? and 项目名称=?",
-							subr["检验项目*"],
-							subr["结果单位*"],
-							subr["检验依据*"],
-							subr["检验结果*"],
-							subr["结果判定*"],
-							subr["判定依据*"],
-							subr["最小允许限*"],
-							subr["最大允许限*"],
-							subr["方法检出限*"],
-							subr["最大允许限*"],
-							subr["备注"],
-							renwu.V任务编号,
-							subr["检验项目*"],
-						).Error
+						if rn == 0 { //插入
+							err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,标准值,备注,检验室,检验员,进度,返工,检出限单位) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+								strconv.Itoa(subidx),
+								renwu.V任务编号,
+								strconv.Itoa(subidx),
+								subr["检验项目*"],
+								tr["抽检样品信息_样品名称"],
+								subr["结果单位*"],
+								subr["检验依据*"],
+								subr["检验结果*"],
+								subr["结果判定*"],
+								subr["判定依据*"],
+								subr["最小允许限*"],
+								subr["最大允许限*"],
+								subr["方法检出限*"],
+								subr["最大允许限*"],
+								subr["备注"],
+								jianyanshi,
+								jianyanyuan,
+								jindu,
+								"0",
+								subr["检出限单位*"],
+							).Error
+							if err != nil {
+								return err
+							}
+						} else { //添加
+							err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,标准值=?,备注=?,检出限单位=? where 任务编号=? and 项目名称=?",
+								subr["检验项目*"],
+								subr["结果单位*"],
+								subr["检验依据*"],
+								subr["检验结果*"],
+								subr["结果判定*"],
+								subr["判定依据*"],
+								subr["最小允许限*"],
+								subr["最大允许限*"],
+								subr["方法检出限*"],
+								subr["最大允许限*"],
+								subr["备注"],
+								subr["检出限单位*"],
+								renwu.V任务编号,
+								subr["检验项目*"],
+							).Error
+							if err != nil {
+								return err
+							}
+						}
+					}
+				}else{
+					for idx, subr := range subtr {
+						subidx := idx + 1
+						rn := 0
+						err = models.Ctx().Model(&models.Jianyanxiangmu{}).Where("任务编号=? and 项目名称=?", renwu.V任务编号, subr["检验项目*"]).Count(&rn).Error
 						if err != nil {
 							return err
+						}
+						if rn == 0 { //插入
+							err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("insert into 检验项目 (序号,任务编号,显示序号,项目名称,样品名称,单位,检验方法,实测值,单项结论,判定依据,最小允许限,最大允许限,检出限,标准值,备注,检验室,检验员,进度,返工) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+								strconv.Itoa(subidx),
+								renwu.V任务编号,
+								strconv.Itoa(subidx),
+								subr["检验项目*"],
+								tr["抽检样品信息_样品名称"],
+								subr["结果单位*"],
+								subr["检验依据*"],
+								subr["检验结果*"],
+								subr["结果判定*"],
+								subr["判定依据*"],
+								subr["最小允许限*"],
+								subr["最大允许限*"],
+								subr["方法检出限*"],
+								subr["最大允许限*"],
+								subr["备注"],
+								jianyanshi,
+								jianyanyuan,
+								jindu,
+								"0",
+							).Error
+							if err != nil {
+								return err
+							}
+						} else { //添加
+							err = models.Ctx().Model(&models.Jianyanxiangmu{}).Exec("update 检验项目 set 项目名称=?,单位=?,检验方法=?,实测值=?,单项结论=?,判定依据=?,最小允许限=?,最大允许限=?,检出限=?,标准值=?,备注=? where 任务编号=? and 项目名称=?",
+								subr["检验项目*"],
+								subr["结果单位*"],
+								subr["检验依据*"],
+								subr["检验结果*"],
+								subr["结果判定*"],
+								subr["判定依据*"],
+								subr["最小允许限*"],
+								subr["最大允许限*"],
+								subr["方法检出限*"],
+								subr["最大允许限*"],
+								subr["备注"],
+								renwu.V任务编号,
+								subr["检验项目*"],
+							).Error
+							if err != nil {
+								return err
+							}
 						}
 					}
 				}
