@@ -23,7 +23,8 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/tealeg/xlsx v1.0.5
-	github.com/ying32/govcl v1.2.6-beta.3.0.20190821083642-391d3098431a
+	github.com/ying32/dylib v0.0.0-20200305075302-6eba4f831b29 // indirect
+	github.com/ying32/govcl v1.2.10
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 	golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e // indirect
 	google.golang.org/grpc v1.25.1

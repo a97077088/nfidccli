@@ -46,7 +46,7 @@ type TFormHomeFields struct {
 	test_platform_init bool
 	test_platform_ck   string
 
-	renwudapingtaisql_rule    [][]string
+	renwudapingtaisql_rule   [][]string
 	jianyanjieguosql_rule    [][]string
 	jianyanjieguoexcel_rule  [][]string
 	renwudapingtaiexcel_rule [][]string
@@ -257,7 +257,7 @@ func (f *TFormHome) Exportrenwudapingtai_excel(thread int, data []*nifdc.Data_o,
 				row := sheet.AddRow()
 				tmj := template.New("tmj")
 				tmj.Funcs(map[string]interface{}{
-					"replace": strings.ReplaceAll,
+					"replace":   strings.ReplaceAll,
 					"replaceex": replaceex,
 				})
 				for _, it := range f.renwudapingtaiexcel_rule {
@@ -414,13 +414,13 @@ func (f *TFormHome) OnButtont2s1Click(sender vcl.IObject) {
 			if err != nil {
 				return err
 			}
-			if len(xsfile.Sheets)== 0 {
+			if len(xsfile.Sheets) == 0 {
 				return errors.New("excel是空数据")
 			}
 
 			rows := xsfile.Sheets[0].Rows
 			for idx, row := range rows {
-				if len(row.Cells)<17||idx==0{
+				if len(row.Cells) < 17 || idx == 0 {
 					continue
 				}
 				d := f.GetUploadDataOrCreate(strings.TrimSpace(row.Cells[0].Value))
@@ -565,8 +565,6 @@ func (f *TFormHome) OnTss2Show(sender vcl.IObject) {
 	}
 }
 
-
-
 func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 	tp := 0
 	if f.Cbbt2s1.ItemIndex() == 0 {
@@ -603,12 +601,12 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 							return errors.New("没有匹配数据")
 						}
 						err := nettool.RNet_Call(nil, func(source *addrmgr.AddrSource) error {
-							if tp==0{
+							if tp == 0 {
 								fddetail, err := nifdc.Test_platform_foodTest_foodDetail(_td.Env_for_key("id").(int), f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
-								testitems,err:=nifdc.Test_platform_api_food_getTestItems(fddetail,f.test_platform_ck,nil)
+								testitems, err := nifdc.Test_platform_api_food_getTestItems(fddetail, f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
@@ -616,7 +614,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								if err != nil {
 									return err
 								}
-								updatas:=nifdc.Build_agriculture_updata(testitems.Rows,testinfo.Rows,_td.Subitem())
+								updatas := nifdc.Build_agriculture_updata(testitems.Rows, testinfo.Rows, _td.Subitem())
 
 								subitem := _td.Subitem()
 								unqualifieds := nifdc.Getunqualified(subitem)
@@ -626,7 +624,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 									jielun = "纯抽检不合格样品"
 									baogaoleibie = "一般不合格报告"
 								}
-								jiancejielun := nifdc.Buildbaogao(subitem)
+								jiancejielun := nifdc.Buildbaogao(nifdc.Convbaotaodata(updatas))
 
 								nifdc.Fill_item(map[string]string{
 									"报告书编号":    _td.SEV("报告书编号"),
@@ -645,14 +643,14 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								atomic.AddInt32(&nok, 1)
 								_td.SSEV("上传结果", "成功")
 								return nil
-							}else if tp==1{
+							} else if tp == 1 {
 								fddetail, err := nifdc.Test_platform_agricultureTest_agricultureDetail(_td.Env_for_key("id").(int), f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
 								//fmt.Println(fddetail["sample_code"])
 
-								testitems,err:=nifdc.Test_platform_api_agriculture_getTestItems(fddetail,f.test_platform_ck,nil)
+								testitems, err := nifdc.Test_platform_api_agriculture_getTestItems(fddetail, f.test_platform_ck, nil)
 								if err != nil {
 									return err
 								}
@@ -660,7 +658,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								if err != nil {
 									return err
 								}
-								updatas:=nifdc.Build_agriculture_updata(testitems.Rows,testinfo.Rows,_td.Subitem())
+								updatas := nifdc.Build_agriculture_updata(testitems.Rows, testinfo.Rows, _td.Subitem())
 
 								subitem := _td.Subitem()
 								unqualifieds := nifdc.Getunqualified(subitem)
@@ -670,7 +668,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 									jielun = "纯抽检不合格样品"
 									baogaoleibie = "一般不合格报告"
 								}
-								jiancejielun := nifdc.Buildbaogao(subitem)
+								jiancejielun := nifdc.Buildbaogao(nifdc.Convbaotaodata(updatas))
 
 								nifdc.Fill_item(map[string]string{
 									"报告书编号":    _td.SEV("报告书编号"),
@@ -1017,15 +1015,12 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_f
 				}
 				if cn != 0 {
 					//已导入的跳过
-					fds := []string{
-
-					}
-					vds := []string{
-					}
+					fds := []string{}
+					vds := []string{}
 
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
-						"replace": strings.ReplaceAll,
+						"replace":   strings.ReplaceAll,
 						"replaceex": replaceex,
 					})
 					for _, it := range f.jianyanjieguosql_rule {
@@ -1051,19 +1046,19 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_f
 						vds = append(vds, webv)
 					}
 
-					forupdates:=[]string{}
-					for idx,fd:=range fds{
-						forupdates=append(forupdates,fmt.Sprintf("%s=%s",fd,vds[idx],))
+					forupdates := []string{}
+					for idx, fd := range fds {
+						forupdates = append(forupdates, fmt.Sprintf("%s=%s", fd, vds[idx]))
 					}
 
-					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates,",")),fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),).Error
+					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates, ",")), fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"])).Error
 					if err != nil {
 						return err
 					}
 					atomic.AddInt32(&nrey, 1)
 					_d.User.SSEV("处理结果", "更新")
 					return nil
-				}else{
+				} else {
 					fds := []string{
 						"id",
 						"任务编号",
@@ -1077,7 +1072,7 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_sql(thread int, data []*nifdc.Api_f
 
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
-						"replace": strings.ReplaceAll,
+						"replace":   strings.ReplaceAll,
 						"replaceex": replaceex,
 					})
 					for _, it := range f.jianyanjieguosql_rule {
@@ -1310,7 +1305,7 @@ func (f *TFormHome) Exportxiazaijianyanrenwu_excel(thread int, data []*nifdc.Api
 				row := sheet.AddRow()
 				tmj := template.New("tmj")
 				tmj.Funcs(map[string]interface{}{
-					"replace": strings.ReplaceAll,
+					"replace":   strings.ReplaceAll,
 					"replaceex": replaceex,
 				})
 				for _, it := range f.jianyanjieguoexcel_rule {
@@ -1456,22 +1451,22 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 						if err != nil {
 							return nil, err
 						}
-						itemsr,err:=nifdc.Test_platform_api_food_getTestItems(tr,f.test_platform_ck,nil)
+						itemsr, err := nifdc.Test_platform_api_food_getTestItems(tr, f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						rmp := nifdc.TestInfotoMap(testinfor.Rows, itemsr.Rows)
 						return rmp, nil
 					} else if tp == 1 { //农产品
 						testinfor, err := nifdc.Test_platform_api_agriculture_getTestInfo(tr["sd"], f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						itemsr,err:=nifdc.Test_platform_api_agriculture_getTestItems(tr,f.test_platform_ck,nil)
+						itemsr, err := nifdc.Test_platform_api_agriculture_getTestItems(tr, f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						rmp := nifdc.TestInfotoMap(testinfor.Rows, itemsr.Rows)
 						return rmp, nil
 					}
 					return nil, errors.New("不支持的模式")
@@ -1486,27 +1481,25 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 					return err
 				}
 
+				jianyanshi := "GC"
+				jianyanyuan := "检验员"
+				jindu := "20"
 
-				jianyanshi:="GC"
-				jianyanyuan:="检验员"
-				jindu:="20"
-
-				if user=="15738889730"{
-					jianyanshi="YJ"
-					jianyanyuan=""
+				if user == "15738889730" {
+					jianyanshi = "YJ"
+					jianyanyuan = ""
 				}
 
-				if  user=="18039661206"{
-					jianyanshi="YJ"
-					jianyanyuan="检验员"
+				if user == "18039661206" {
+					jianyanshi = "YJ"
+					jianyanyuan = "检验员"
 
 				}
-				if user!="13483719195" {
-					jindu="0"
+				if user != "13483719195" {
+					jindu = "0"
 				}
 
-
-				if user=="15738889730"{
+				if user == "15738889730" {
 					for idx, subr := range subtr {
 						subidx := idx + 1
 						rn := 0
@@ -1562,7 +1555,7 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_sql(thread int, data []*nifdc.Api
 							}
 						}
 					}
-				}else{
+				} else {
 					for idx, subr := range subtr {
 						subidx := idx + 1
 						rn := 0
@@ -1726,22 +1719,22 @@ func (f *TFormHome) Exportxiazaijianyanxiangmu_web(thread int, data []*nifdc.Api
 						if err != nil {
 							return nil, err
 						}
-						itemsr,err:=nifdc.Test_platform_api_food_getTestItems(tr,f.test_platform_ck,nil)
+						itemsr, err := nifdc.Test_platform_api_food_getTestItems(tr, f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						rmp := nifdc.TestInfotoMap(testinfor.Rows, itemsr.Rows)
 						return rmp, nil
 					} else if tp == 1 { //农产品
 						testinfor, err := nifdc.Test_platform_api_agriculture_getTestInfo(tr["sd"], f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						itemsr,err:=nifdc.Test_platform_api_agriculture_getTestItems(tr,f.test_platform_ck,nil)
+						itemsr, err := nifdc.Test_platform_api_agriculture_getTestItems(tr, f.test_platform_ck, nil)
 						if err != nil {
 							return nil, err
 						}
-						rmp:=nifdc.TestInfotoMap(testinfor.Rows,itemsr.Rows)
+						rmp := nifdc.TestInfotoMap(testinfor.Rows, itemsr.Rows)
 						return rmp, nil
 					}
 					return nil, errors.New("不支持的模式")
@@ -1848,9 +1841,8 @@ func (f *TFormHome) OnButtonp3s6Click(sender vcl.IObject) {
 	}()
 }
 
-
 //下载任务大平台导出到sql
-func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Data_o, ) error {
+func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Data_o) error {
 	if models.Ctx() == nil {
 		return errors.New("数据库未配置")
 	}
@@ -1888,15 +1880,12 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 				}
 				if cn != 0 {
 					//已导入的跳过
-					fds := []string{
-
-					}
-					vds := []string{
-					}
+					fds := []string{}
+					vds := []string{}
 
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
-						"replace": strings.ReplaceAll,
+						"replace":   strings.ReplaceAll,
 						"replaceex": replaceex,
 					})
 					for _, it := range f.renwudapingtaisql_rule {
@@ -1922,19 +1911,19 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 						vds = append(vds, webv)
 					}
 
-					forupdates:=[]string{}
-					for idx,fd:=range fds{
-						forupdates=append(forupdates,fmt.Sprintf("%s=%s",fd,vds[idx],))
+					forupdates := []string{}
+					for idx, fd := range fds {
+						forupdates = append(forupdates, fmt.Sprintf("%s=%s", fd, vds[idx]))
 					}
 
-					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates,",")),fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"]),).Error
+					err = models.Ctx().Exec(fmt.Sprintf("update 检验任务 set %s where 抽样单号=?", strings.Join(forupdates, ",")), fmt.Sprintf("'%s'", tr["抽样基础信息_抽样单编号"])).Error
 					if err != nil {
 						return err
 					}
 					atomic.AddInt32(&nrey, 1)
 					_d.User.SSEV("处理结果", "更新")
 					return nil
-				}else{
+				} else {
 					fds := []string{
 						"id",
 						"任务编号",
@@ -1948,7 +1937,7 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 
 					tmj := template.New("tmj")
 					tmj.Funcs(map[string]interface{}{
-						"replace": strings.ReplaceAll,
+						"replace":   strings.ReplaceAll,
 						"replaceex": replaceex,
 					})
 					for _, it := range f.renwudapingtaisql_rule {
@@ -1998,6 +1987,7 @@ func (f *TFormHome) Exportxiazairenwudapingtai_sql(thread int, data []*nifdc.Dat
 	})
 	return nil
 }
+
 //导出任务大平台到sql
 func (f *TFormHome) OnButtonp1s3Click(sender vcl.IObject) {
 	f.sample_ds_lk.Lock()
@@ -2025,7 +2015,7 @@ func (f *TFormHome) OnButtonp1s3Click(sender vcl.IObject) {
 				f.Gauge1.SetProgress(0)
 				f.Gauge1.SetMaxValue(int32(len(tmpds)))
 			})
-			err = f.Exportxiazairenwudapingtai_sql(thread, tmpds,)
+			err = f.Exportxiazairenwudapingtai_sql(thread, tmpds)
 			if err != nil {
 				return err
 			}
@@ -2039,10 +2029,6 @@ func (f *TFormHome) OnButtonp1s3Click(sender vcl.IObject) {
 		}
 	}()
 }
-
-
-
-
 
 //删除任务大平台导出到sql
 func (f *TFormHome) Deleterenwudapingtai_sql(thread int, data []*nifdc.Data_o) error {
@@ -2121,4 +2107,3 @@ func (f *TFormHome) OnButtonp1s4Click(sender vcl.IObject) {
 		}
 	}()
 }
-
