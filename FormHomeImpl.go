@@ -565,7 +565,6 @@ func (f *TFormHome) OnTss2Show(sender vcl.IObject) {
 	}
 }
 
-
 func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 	tp := 0
 	if f.Cbbt2s1.ItemIndex() == 0 {
@@ -637,7 +636,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 								}, fddetail)
 								nifdc.Fill_subitem(subitem, testinfo.Rows)
 
-								updatas=nifdc.MergeUpdates(updatas,subitem)
+								updatas = nifdc.MergeUpdates(updatas, subitem)
 
 								err = nifdc.Test_platform_api_food_save(fddetail, updatas, f.test_platform_ck, nil)
 								if err != nil {
@@ -683,7 +682,7 @@ func (f *TFormHome) OnButtont2s3Click(sender vcl.IObject) {
 									"检验结论":     jiancejielun,
 								}, fddetail)
 
-								updatas=nifdc.MergeUpdates(updatas,subitem)
+								updatas = nifdc.MergeUpdates(updatas, subitem)
 
 								err = nifdc.Test_platform_api_agriculture_save(fddetail, updatas, f.test_platform_ck, nil)
 								if err != nil {
